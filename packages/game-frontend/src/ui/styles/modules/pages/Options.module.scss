@@ -1,0 +1,83 @@
+@use "../../variables.scss" as variables;
+@use "sass:color" as color;
+
+.sidebar {
+  .title {
+    font-size: 3rem;
+  }
+
+  .categories {
+    $item-height: 60px;
+
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 240px;
+    gap: 20px;
+
+    .category {
+      font-size: 1.5rem;
+      list-style: none;
+      height: $item-height;
+      padding-inline: 1.5rem;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+
+      &.selected {
+        color: color.invert(variables.$text-primary-color);
+      }
+
+      &:last-child {
+        margin-top: 4rem;
+      }
+    }
+
+    .selectedIndicator {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: $item-height;
+      background: variables.$accent-color;
+      z-index: -1;
+      transition: all 0.2s ease;
+    }
+
+    &:has(.category.hovered:last-child) .hoverIndicator {
+      transform: translateY(4rem);
+    }
+  }
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  width: 100%;
+
+  .separator {
+    margin-top: 2rem;
+  }
+}
+
+.hoverIndicator {
+  position: fixed;
+  background: rgba(variables.$accent-color, $alpha: 0.1);
+  border: 2px solid rgba(variables.$accent-color, 0.4);
+  transition: all 0.2s ease;
+  z-index: -2;
+  animation: zoom 0.2s ease;
+
+  @keyframes zoom {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}

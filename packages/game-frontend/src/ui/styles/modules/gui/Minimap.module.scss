@@ -1,0 +1,27 @@
+@use "../../variables.scss" as variables;
+
+.container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  width: fit-content;
+
+  .minimap {
+    border: 2px solid variables.$accent-color;
+    background: #00000055;
+    height: 250px;
+    width: 250px;
+    overflow: hidden;
+    position: relative;
+
+    .icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: 50px;
+    }
+  }
+}

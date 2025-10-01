@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  game-frontend:
+    build: ./packages/game-frontend
+    depends_on:
+      - game-server
+    ports:
+      - "3000:3000"
+  game_server:
+    build: ./packages/game-server
+    ports:
+      - "8080:8080"
+    environment:
+      - BUN_INSTALL=/usr/local/bin/bun
+    volumes:
+      - ./packages/game-server:/app
+  speech-api:
+    build: ./packages/speech-api
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./packages/speech-api/models:/app/models

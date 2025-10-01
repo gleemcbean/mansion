@@ -1,0 +1,9 @@
+@use "../../variables.scss" as variables;
+
+.container {
+  @include variables.crt-overlay;
+
+  position: fixed;
+  inset: 2rem;
+  pointer-events: none;
+}

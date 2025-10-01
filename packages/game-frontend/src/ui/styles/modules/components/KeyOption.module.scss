@@ -1,0 +1,33 @@
+@use "../../variables.scss" as variables;
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .label {
+    font-size: 1.35rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+
+    .requiresReload {
+      color: variables.$danger-color;
+    }
+
+    .value {
+      margin-left: auto;
+      font-size: 1.15rem;
+      color: variables.$accent-color;
+    }
+  }
+
+  .keyButton {
+    width: 9rem;
+    height: 2.8rem;
+    border: none;
+    background: rgba(white, 0.1);
+    font-size: 1.1rem;
+    margin-left: 0.5rem;
+  }
+}

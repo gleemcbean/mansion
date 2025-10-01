@@ -1,0 +1,50 @@
+@use "sass:color" as color;
+
+$accent-color: #ffd000;
+$primary-color: #6ae9d8;
+$secondary-color: #121212;
+$danger-color: #ee4b81;
+$success-color: #54db86;
+
+$text-primary-color: #ffffff;
+$text-secondary-color: #aaaaaa;
+
+$section-max-width: 1200px;
+$section-max-height: 700px;
+
+@mixin crt-overlay {
+  $background: #000;
+
+  filter: blur(0.65px);
+
+  &::before {
+    content: "";
+    inset: 0;
+    position: fixed;
+    pointer-events: none;
+    background: linear-gradient(
+        rgba($background, 0) 50%,
+        rgba(color.adjust($background, $lightness: -10%), 0.35) 50%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(red, 0.06),
+        rgba(green, 0.02),
+        rgba(blue, 0.06)
+      );
+    z-index: 999;
+    background-size: 100% 2px, 3px 100%;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-2dvw);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

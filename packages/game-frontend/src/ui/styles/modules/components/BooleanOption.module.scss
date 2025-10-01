@@ -1,0 +1,56 @@
+@use "../../variables.scss" as variables;
+@use "sass:color" as color;
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .label {
+    font-size: 1.35rem;
+    font-weight: 500;
+
+    .requiresReload {
+      color: variables.$danger-color;
+    }
+  }
+
+  .buttons {
+    $button-width: 5rem;
+
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    .button {
+      font-size: 1.25rem;
+      width: $button-width;
+      padding-block: 0.5rem;
+      background: transparent;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .value {
+      position: absolute;
+      left: 0;
+      width: $button-width;
+      height: 100%;
+      background: variables.$accent-color;
+      z-index: -1;
+      transition: all 0.2s ease;
+
+      &.off {
+        transform: translateX($button-width);
+      }
+    }
+
+    &:has(.value.on) .button.on {
+      color: color.invert(variables.$text-primary-color);
+    }
+
+    &:has(.value.off) .button.off {
+      color: color.invert(variables.$text-primary-color);
+    }
+  }
+}

@@ -1,0 +1,30 @@
+@use "../../variables.scss" as variables;
+
+.container {
+  @include variables.crt-overlay;
+
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  transition: all 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+
+  .modal {
+    transform: scale(0.8);
+    transition: all 0.1s ease;
+  }
+
+  &.visible {
+    opacity: 1;
+    pointer-events: all;
+
+    .modal {
+      transform: scale(1);
+    }
+  }
+}

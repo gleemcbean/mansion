@@ -1,0 +1,77 @@
+@use "./variables.scss" as variables;
+
+@font-face {
+  font-family: "Saira";
+  src: url("/fonts/Saira.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "REM";
+  src: url("/fonts/REM.ttf") format("truetype");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Saira", sans-serif;
+  outline: none;
+  user-select: none;
+  color: variables.$text-primary-color;
+  cursor: default;
+}
+
+body {
+  overflow: hidden;
+  height: 100dvh;
+  width: 100dvw;
+  background: #000;
+}
+
+img {
+  image-rendering: pixelated;
+}
+
+canvas {
+  image-rendering: pixelated;
+  height: 100dvh;
+  width: 100dvw;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "REM", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transform: skew(-10deg);
+  color: variables.$accent-color;
+}
+
+input[type="range"] {
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+    border: none;
+  }
+
+  &::-moz-range-thumb {
+    width: 0;
+    height: 0;
+    background: transparent;
+    border: none;
+  }
+
+  &::-ms-thumb {
+    width: 0;
+    height: 0;
+    background: transparent;
+    border: none;
+  }
+}

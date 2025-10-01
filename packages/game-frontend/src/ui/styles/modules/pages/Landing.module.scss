@@ -1,0 +1,24 @@
+@use "../../variables.scss" as variables;
+
+.title {
+  font-size: 3rem;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .option {
+    font-size: 1.5rem;
+    transition: all 0.2s ease;
+    list-style: none;
+    padding-left: 1.5rem;
+
+    &.selected {
+      border-left: 0.5rem solid variables.$accent-color;
+      padding-left: 2.5rem;
+      color: variables.$accent-color;
+    }
+  }
+}

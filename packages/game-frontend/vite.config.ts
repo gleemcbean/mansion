@@ -1,0 +1,39 @@
+import { fileURLToPath, URL } from "url";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+// import obfuscatorPlugin from "vite-plugin-javascript-obfuscator";
+// import compressionPlugin from "vite-plugin-compression";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    // compressionPlugin(),
+    // obfuscatorPlugin({
+    //   options: {
+    //     compact: true,
+    //     controlFlowFlattening: true,
+    //     sourceMap: false,
+    //     stringArray: true,
+    //     stringArrayEncoding: ["rc4"],
+    //     stringArrayThreshold: 1,
+    //     unicodeEscapeSequence: false,
+    //   },
+    // }),
+  ],
+  optimizeDeps: {
+    exclude: ["@dimforge/rapier3d-compat"],
+  },
+  resolve: {
+    alias: [
+      {
+        find: "@mansion/shared",
+        replacement: fileURLToPath(new URL("../shared/src", import.meta.url)),
+      },
+      {
+        find: "@",
+        replacement: fileURLToPath(new URL("./src", import.meta.url)),
+      },
+    ],
+  },
+});
