@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Container from "../components/Container";
-import { Page, type RouteProps } from "../Router";
+import { Page } from "../Router";
 import styles from "../styles/modules/pages/Landing.module.scss";
 import Join from "../modals/Join";
 import { type ModalRef } from "../components/Modal";
 import useLobby from "@/hooks/useLobby";
 
-export default function Landing({ setPage }: RouteProps) {
+type LandingProps = {
+  setPage: (page: Page) => void;
+};
+
+export default function Landing({ setPage }: LandingProps) {
   const [selected, setSelected] = useState(0);
   const joinRef = useRef<ModalRef>(null);
   const { metadata } = useLobby();

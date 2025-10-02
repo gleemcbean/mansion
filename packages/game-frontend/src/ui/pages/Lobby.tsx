@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Page, type RouteProps } from "../Router";
 import useClient from "@/hooks/useClient";
 import useLobby from "@/hooks/useLobby";
 import useWebsocket from "@/hooks/useWebsocket";
@@ -46,11 +45,18 @@ type PlayerItemProps = {
   volume: number;
   muted: boolean;
   hover: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
-  setOption: (key: keyof typeof DEFAULT_OPTIONS, value: any) => void;
+  setOption: (
+    key: keyof typeof DEFAULT_OPTIONS,
+    value: boolean | number | [string, string]
+  ) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
   kick: () => void;
   promote: () => void;
+};
+
+type LobbyProps = {
+  back: () => void;
 };
 
 const X_OFFSET = 10;
@@ -195,7 +201,7 @@ function PlayerItem({
   );
 }
 
-export default function Lobby({ setPage }: RouteProps) {
+export default function Lobby({ back }: LobbyProps) {
   const [copied, setCopied] = useState(false);
   const { client, options, setClient, setOption } = useClient();
   const { addHandler, send } = useWebsocket();
@@ -251,7 +257,7 @@ export default function Lobby({ setPage }: RouteProps) {
 
     exit();
     setMetadata(null);
-    setPage(Page.Landing);
+    back();
   };
 
   const kickPlayer = (uuid: UUID) => {
@@ -276,7 +282,7 @@ export default function Lobby({ setPage }: RouteProps) {
       addHandler(ServerPacketType.GameClosed, () => {
         exit();
         setMetadata(null);
-        setPage(Page.Landing);
+        back();
       }),
       addHandler(ServerPacketType.PlayerJoined, ({ player }) => {
         addPlayer(player);
@@ -290,7 +296,7 @@ export default function Lobby({ setPage }: RouteProps) {
       addHandler(ServerPacketType.Kicked, () => {
         exit();
         setMetadata(null);
-        setPage(Page.Landing);
+        back();
       }),
       addHandler(ServerPacketType.GameStarted, ({ metadata, gameData }) => {
         setMetadata(metadata);

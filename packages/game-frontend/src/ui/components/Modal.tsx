@@ -3,6 +3,7 @@ import styles from "../styles/modules/components/Modal.module.scss";
 
 type ModalProps = {
   children?: React.ReactNode;
+  closeOnOutsideClick?: boolean;
 } & React.HTMLAttributes<HTMLElement>;
 
 export type ModalRef = {
@@ -12,7 +13,7 @@ export type ModalRef = {
 };
 
 export default forwardRef<ModalRef, ModalProps>(
-  ({ children, ...props }, ref) => {
+  ({ children, closeOnOutsideClick, ...props }, ref) => {
     const [visible, setVisible] = useState(false);
 
     useImperativeHandle(ref, () => ({
@@ -28,7 +29,7 @@ export default forwardRef<ModalRef, ModalProps>(
     return (
       <section
         className={`${styles.container}${visible ? ` ${styles.visible}` : ""}`}
-        onClick={backgroundClick}
+        onClick={closeOnOutsideClick ? backgroundClick : undefined}
       >
         <div className={styles.modal} {...props}>
           {children}

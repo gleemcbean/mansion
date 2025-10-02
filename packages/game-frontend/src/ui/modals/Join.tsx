@@ -50,7 +50,7 @@ export default forwardRef<ModalRef>((_props, ref) => {
   const close = () => (ref as React.RefObject<ModalRef>)?.current?.close();
 
   return (
-    <Modal ref={ref}>
+    <Modal ref={ref} closeOnOutsideClick>
       <h4 className={styles.label}>Game code: </h4>
       <input
         type="text"

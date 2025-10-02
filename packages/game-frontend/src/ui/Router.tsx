@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Landing from "./pages/Landing";
 import Lobby from "./pages/Lobby";
 import Options from "./pages/Options";
@@ -8,10 +8,6 @@ export enum Page {
   Lobby,
   Options,
 }
-
-export type RouteProps = {
-  setPage: React.Dispatch<React.SetStateAction<Page>>;
-};
 
 export default function Router() {
   const [page, setPage] = useState<Page>(Page.Landing);
@@ -38,9 +34,9 @@ export default function Router() {
     case Page.Landing:
       return <Landing setPage={setPage} />;
     case Page.Lobby:
-      return <Lobby setPage={setPage} />;
+      return <Lobby back={() => setPage(Page.Landing)} />;
     case Page.Options:
-      return <Options setPage={setPage} />;
+      return <Options back={() => setPage(Page.Landing)} />;
     default:
       throw new Error("Unknown page");
   }

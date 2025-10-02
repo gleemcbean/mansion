@@ -4,7 +4,6 @@ import {
   OptionType,
 } from "@/constants/Options";
 import Container from "../components/Container";
-import { Page, type RouteProps } from "../Router";
 import styles from "../styles/modules/pages/Options.module.scss";
 import { useCallback, useEffect, useState } from "react";
 import BooleanOption from "../components/BooleanOption";
@@ -25,9 +24,13 @@ export type ComponentProps = {
   hover: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 };
 
+type OptionsProps = {
+  back: () => void;
+};
+
 const HOVER_SHAPE_PADDING = 8;
 
-export default function Options({ setPage }: RouteProps) {
+export default function Options({ back }: OptionsProps) {
   const { options, setOption } = useClient();
   const [selected, setSelected] = useState(0);
   const [hoverShape, setHoverShape] = useState<HoverShape>(null);
@@ -68,11 +71,7 @@ export default function Options({ setPage }: RouteProps) {
               {category}
             </li>
           ))}
-          <li
-            className={styles.category}
-            onClick={() => setPage(Page.Landing)}
-            onMouseEnter={hover}
-          >
+          <li className={styles.category} onClick={back} onMouseEnter={hover}>
             Back
           </li>
         </ul>

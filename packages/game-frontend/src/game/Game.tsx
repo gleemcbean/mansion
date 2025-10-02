@@ -1,5 +1,5 @@
 import { Canvas, events } from "@react-three/fiber";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import PostProcessing from "./components/shaders/PostProcessing";
 import { DEFAULT_OPTIONS, type Options } from "@/constants/Options";
@@ -16,11 +16,13 @@ import React from "react";
 import Menu from "@/ui/modals/Menu";
 import PlayerManager from "./components/managers/PlayerManager";
 import Hud from "@/ui/gui/Hud";
+import type { ModalRef } from "@/ui/components/Modal";
 
 export default function Game() {
   const [options, setOptions] = useState<Partial<Options> | null>(null);
   const { metadata } = useLobby();
   const { client } = useClient();
+  const menuRef = useRef<ModalRef | null>(null);
 
   const spawn = useMemo(() => {
     const { 0: x, 2: z } = client.playerData!.gameData!.position;
@@ -29,6 +31,18 @@ export default function Game() {
 
   useEffect(() => {
     setOptions(JSON.parse(localStorage.getItem("options") || "{}"));
+
+    const menuToggle = () => {
+      if (document.pointerLockElement) {
+        menuRef.current?.close();
+      } else {
+        menuRef.current?.open();
+      }
+    };
+
+    document.addEventListener("pointerlockchange", menuToggle);
+
+    return () => document.removeEventListener("pointerlockchange", menuToggle);
   }, []);
 
   if (!options || !metadata) return <Loading />;
@@ -84,7 +98,7 @@ export default function Game() {
         {options.stats && <Stats />}
       </Canvas>
       <Hud />
-      <Menu />
+      <Menu ref={menuRef} />
     </React.Fragment>
   );
 }
