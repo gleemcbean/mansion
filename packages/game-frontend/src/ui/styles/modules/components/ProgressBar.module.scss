@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  .progressBar {
+    border: 2px solid black;
+    display: flex;
+
+    .progression {
+      height: 100%;
+    }
+  }
+}

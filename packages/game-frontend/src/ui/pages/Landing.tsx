@@ -18,7 +18,7 @@ export default function Landing({ setPage }: LandingProps) {
   const options = useMemo(
     () => [
       { label: "Host Game", action: () => setPage(Page.Lobby) },
-      { label: "Join Game", action: () => joinRef.current?.open() },
+      { label: "Enter Code", action: () => joinRef.current?.open() },
       { label: "Options", action: () => setPage(Page.Options) },
     ],
     []

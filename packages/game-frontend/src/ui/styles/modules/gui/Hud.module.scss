@@ -6,4 +6,12 @@
   position: fixed;
   inset: 2rem;
   pointer-events: none;
+
+  .progressions {
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }

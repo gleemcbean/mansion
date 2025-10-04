@@ -1,0 +1,65 @@
+@use "../../variables.scss" as variables;
+@use "sass:color" as color;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 50dvw;
+  animation: slide-in-left 0.2s ease;
+
+  .title {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .option {
+      font-size: 1.5rem;
+      transition: all 0.2s ease;
+      list-style: none;
+      padding-left: 1.5rem;
+
+      &.selected {
+        border-left: 0.5rem solid variables.$accent-color;
+        padding-left: 2.5rem;
+        color: variables.$accent-color;
+      }
+    }
+  }
+
+  .leaveMessage {
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+  }
+
+  .buttons {
+    display: flex;
+    width: 100%;
+    gap: 1rem;
+
+    .noButton,
+    .yesButton {
+      background: variables.$secondary-color;
+      border: none;
+      padding: 0.8rem 2.6rem;
+      font-size: 1.2rem;
+      transition: 0.2s ease;
+
+      &:hover {
+        background: color.adjust(variables.$secondary-color, $lightness: 10%);
+      }
+    }
+
+    .yesButton {
+      background: variables.$danger-color;
+
+      &:hover {
+        background: color.adjust(variables.$danger-color, $lightness: -10%);
+      }
+    }
+  }
+}
