@@ -4,5 +4,9 @@
   "private": true,
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "three": "^0.180.0"
+  }
 }

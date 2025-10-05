@@ -1,12 +1,12 @@
 import type { Client } from "@mansion/shared/types/player";
-import { Text, useGLTF } from "@react-three/drei";
+import { Sparkles, Text, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   CapsuleCollider,
   RapierRigidBody,
   RigidBody,
 } from "@react-three/rapier";
-import { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { Quat, Vec3 } from "@mansion/shared/types/util";
 import {
@@ -46,6 +46,7 @@ export default function Player({ playerData, username }: PlayerProps) {
 
   const bodyRef = useRef<RapierRigidBody>(null);
   const nameTagRef = useRef<THREE.Object3D>(null);
+  const capLightRef = useRef<THREE.PointLight>(null);
 
   const getMaterialByName = (
     scene: THREE.Object3D,
@@ -73,16 +74,14 @@ export default function Player({ playerData, username }: PlayerProps) {
   }, [gameData.position, gameData.quaternion]);
 
   useEffect(() => {
-    const cap = getMaterialByName(character, "Cap");
-    if (cap) cap.color.set(playerData.mushroomCapColor);
+    const cap = getMaterialByName(character, "Cap")!;
+    cap.color.set(playerData.mushroomCapColor);
 
     const armL = character.getObjectByName("UpperArmL")!;
     const armR = character.getObjectByName("UpperArmR")!;
 
-    if (armL && armR) {
-      armL.rotation.y = (-Math.PI / 16) * 5;
-      armR.rotation.y = (Math.PI / 16) * 5;
-    }
+    armL.rotation.y = (-Math.PI / 16) * 5;
+    armR.rotation.y = (Math.PI / 16) * 5;
   }, [playerData.mushroomCapColor]);
 
   useFrame(({ camera, clock }, delta) => {
@@ -131,11 +130,17 @@ export default function Player({ playerData, username }: PlayerProps) {
     character.rotation.y = bodyYaw.current;
 
     const head = character.getObjectByName("Head")!;
-    if (head) {
-      head.rotation.order = "YXZ";
-      head.rotation.y = clampedHeadYaw;
-      head.rotation.x = -targetEuler.x;
-      head.rotation.z = -targetEuler.z;
+    head.rotation.order = "YXZ";
+    head.rotation.y = clampedHeadYaw;
+    head.rotation.x = -targetEuler.x;
+    head.rotation.z = -targetEuler.z;
+
+    if (capLightRef.current) {
+      const mushroom = character.getObjectByName("Mushroom")!;
+      const mushroomWorldPos = new THREE.Vector3();
+      mushroom.getWorldPosition(mushroomWorldPos);
+      const mushroomPos = character.worldToLocal(mushroomWorldPos.clone());
+      capLightRef.current.position.copy(mushroomPos);
     }
 
     const speed = velocityRef.current.length();
@@ -143,39 +148,64 @@ export default function Player({ playerData, username }: PlayerProps) {
     const legR = character.getObjectByName("LegR")!;
     const armL = character.getObjectByName("UpperArmL")!;
     const armR = character.getObjectByName("UpperArmR")!;
+    const sprinkles = getMaterialByName(character, "Sprinkles")!;
+    sprinkles.emissive = new THREE.Color(0xe479ed);
+    sprinkles.emissiveIntensity = playerData.gameData?.lighting ? 5 : 0;
 
     if (speed > 0.01) {
       const t = clock.elapsedTime * 20;
-      if (legL && legR && armL && armR) {
-        legL.rotation.x = (Math.PI / 4) * (4 + Math.cos(t));
-        legR.rotation.x = (Math.PI / 4) * (4 + Math.sin(t));
-        armL.rotation.z = (Math.PI / 4.5) * (6 + Math.sin(t));
-        armR.rotation.z = (-Math.PI / 4.5) * (6 + Math.cos(t));
-      }
+      legL.rotation.x = (Math.PI / 4) * (4 + Math.cos(t));
+      legR.rotation.x = (Math.PI / 4) * (4 + Math.sin(t));
+      armL.rotation.z = (Math.PI / 4.5) * (6 + Math.sin(t));
+      armR.rotation.z = (-Math.PI / 4.5) * (6 + Math.cos(t));
     } else {
-      if (legL && legR && armL && armR) {
-        legL.rotation.x = Math.PI;
-        legR.rotation.x = Math.PI;
-        armL.rotation.z = -Math.PI / 2;
-        armR.rotation.z = Math.PI / 2;
-      }
+      legL.rotation.x = Math.PI;
+      legR.rotation.x = Math.PI;
+      armL.rotation.z = -Math.PI / 2;
+      armR.rotation.z = Math.PI / 2;
     }
   });
 
   return (
     <RigidBody type="kinematicPosition" colliders={false} ref={bodyRef}>
-      <Text
-        position={[0, (PL_HEIGHT / 4) * 3, 0]}
-        fontSize={0.1}
-        color="white"
-        anchorX="center"
-        anchorY="middle"
-        ref={nameTagRef}
-      >
-        {username}
-      </Text>
+      {options.hud && (
+        <Text
+          position={[0, (PL_HEIGHT / 4) * 3, 0]}
+          fontSize={0.1}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          ref={nameTagRef}
+        >
+          {username}
+        </Text>
+      )}
       <group position={[0, -PL_HEIGHT / 2 - 0.3, 0]} rotation={[0, Math.PI, 0]}>
         <primitive object={character} />
+        {playerData.gameData!.lighting && (
+          <React.Fragment>
+            <pointLight
+              intensity={2}
+              distance={10}
+              color={playerData.mushroomCapColor}
+              ref={capLightRef}
+            />
+            <pointLight
+              position={[0, PL_HEIGHT / 2, 0]}
+              intensity={4}
+              distance={8}
+              decay={0.6}
+              color={0xe8a7f0}
+            />
+            <Sparkles
+              count={100}
+              speed={0.4}
+              color="white"
+              size={1}
+              scale={3}
+            />
+          </React.Fragment>
+        )}
       </group>
       <CapsuleCollider args={[PL_HEIGHT / 2, PL_THICKNESS]} friction={0} />
       {options.showHelper && (

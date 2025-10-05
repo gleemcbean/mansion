@@ -29,5 +29,12 @@ export default function App() {
 
   if (!client) return <Loading />;
   if (metadata?.state === LobbyState.InGame) return <Game />;
-  return <Router />;
+  return (
+    <main>
+      <section>
+        <video autoPlay muted loop src="/videos/background.mp4" />
+      </section>
+      <Router />
+    </main>
+  );
 }

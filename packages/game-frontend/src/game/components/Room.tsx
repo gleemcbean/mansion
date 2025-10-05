@@ -14,10 +14,12 @@ export default function Room({ data }: RoomProps) {
   const {
     position: [x, z],
     rotationY,
+    lights,
   } = useMemo(() => {
     return {
       position: data.position,
       rotationY: (Math.PI / 2) * -data.direction,
+      lights: data.t_lights,
     };
   }, [data.position, data.direction]);
 
@@ -27,9 +29,15 @@ export default function Room({ data }: RoomProps) {
         src={`/models/rooms/${data.id}.glb`}
         position={[x, 0, z]}
         rotation={[0, rotationY, 0]}
-        castShadow={options.shadows}
-        receiveShadow={options.shadows}
       />
+      {lights.map((light) => (
+        <pointLight
+          position={light.position}
+          color={light.color}
+          decay={0.8}
+          intensity={4}
+        />
+      ))}
     </RigidBody>
   );
 }

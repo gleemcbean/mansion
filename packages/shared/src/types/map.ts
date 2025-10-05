@@ -1,4 +1,5 @@
-import type { CardinalDirection, Vec2 } from "./util";
+import type { CardinalDirection, Vec2, Vec3 } from "./util";
+import type * as THREE from "three";
 
 export type DoorPoint = {
   position: Vec2;
@@ -9,4 +10,9 @@ export type Door = {
   position: Vec2;
   direction: CardinalDirection;
   openable: boolean;
+};
+
+export type Light = {
+  position: Vec3;
+  color?: THREE.ColorRepresentation;
 };

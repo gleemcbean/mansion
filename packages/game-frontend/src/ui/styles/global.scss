@@ -32,6 +32,22 @@ img {
   image-rendering: pixelated;
 }
 
+section:has(video) {
+  position: fixed;
+  inset: 0;
+
+  video {
+    filter: blur(10px);
+  }
+
+  &::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(#0003, #000);
+  }
+}
+
 canvas {
   image-rendering: pixelated;
   height: 100dvh;

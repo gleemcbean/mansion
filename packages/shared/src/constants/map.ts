@@ -7,7 +7,8 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
     .setTopology([0, 0], [7, 0], [7, 4], [4, 4], [4, 5], [0, 5])
     .addDoorPoint(1.5, 0, CardinalDirection.South)
     .addDoorPoint(5.5, 4, CardinalDirection.North)
-    .addSpawn(2, 3),
+    .addSpawn(2, 3)
+    .addLight(6.5, 2, 3.5, 0xe8a7f0),
   new Room("attics", "Attics", 2)
     .setTopology([0, 0], [5, 0], [5, 2], [3, 2], [3, 5], [0, 5])
     .addDoorPoint(0, 1.5, CardinalDirection.East)

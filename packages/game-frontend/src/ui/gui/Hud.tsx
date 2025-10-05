@@ -3,25 +3,49 @@ import ProgressBar from "../components/ProgressBar";
 import styles from "../styles/modules/gui/Hud.module.scss";
 import Minimap from "./Minimap";
 import { FaHeart } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import {
+  PL_MAX_HEALTH,
+  PL_MAX_STAMINA,
+} from "@mansion/shared/constants/player";
+import useClient from "@/hooks/useClient";
 
 export default function Hud() {
+  const { options, subGameData } = useClient();
+  const [gameData, setGameData] = useState({
+    health: PL_MAX_HEALTH,
+    energy: PL_MAX_STAMINA,
+  });
+
+  useEffect(() => {
+    const unsubscribe = subGameData((data) => {
+      setGameData({
+        health: data.health,
+        energy: data.energy,
+      });
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (!options.hud) return null;
+
   return (
     <div className={styles.container}>
       <Minimap />
       <div className={styles.progressions}>
         <ProgressBar
-          color="#39ade3"
-          value={20}
-          maxValue={100}
+          color="#39dde3"
+          value={gameData.energy}
+          maxValue={PL_MAX_HEALTH}
           height={20}
-          width={500}
           Icon={FaBoltLightning}
           iconSize={20}
         />
         <ProgressBar
           color="#e33941"
-          value={50}
-          maxValue={100}
+          value={gameData.health}
+          maxValue={PL_MAX_STAMINA}
           Icon={FaHeart}
           iconSize={20}
         />

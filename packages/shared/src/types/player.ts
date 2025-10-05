@@ -12,6 +12,9 @@ export type PlayerGameData = {
   quaternion: Quat;
   crouched: boolean;
   running: boolean;
+  energy: number;
+  health: number;
+  lighting: boolean;
 };
 
 export type PlayerData = {

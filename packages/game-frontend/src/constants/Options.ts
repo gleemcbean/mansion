@@ -10,6 +10,7 @@ export const DEFAULT_OPTIONS = {
   bloom: true,
   noise: true,
   chromaticAberration: true,
+  hud: true,
 
   // AUDIO
   muted: false,
@@ -26,12 +27,16 @@ export const DEFAULT_OPTIONS = {
   up: ["Space", null],
   sprint: ["ShiftLeft", null],
   crouch: ["ControlLeft", null],
+  light: ["KeyF", null],
 
   // DEV
   showHelper: false,
   doPostProcessing: true,
   fly: false,
+  noClip: false,
   stats: false,
+  godMode: false,
+  speed: 1,
 };
 
 export type Options = typeof DEFAULT_OPTIONS;
@@ -93,6 +98,11 @@ export const OPTIONS_COMPONENTS = Object.freeze({
       id: "chromaticAberration",
       type: OptionType.Boolean,
       label: "Chromatic Aberration",
+    },
+    {
+      id: "hud",
+      type: OptionType.Boolean,
+      label: "HUD",
     },
   ],
   [OptionCategory.Audio]: [
@@ -172,6 +182,11 @@ export const OPTIONS_COMPONENTS = Object.freeze({
       type: OptionType.Keybind,
       label: "Crouch",
     },
+    {
+      id: "light",
+      type: OptionType.Keybind,
+      label: "Flashlight",
+    },
   ],
   [OptionCategory.Dev]: [
     {
@@ -187,12 +202,30 @@ export const OPTIONS_COMPONENTS = Object.freeze({
     {
       id: "fly",
       type: OptionType.Boolean,
-      label: "Fly Mode",
+      label: "Fly",
+    },
+    {
+      id: "noClip",
+      type: OptionType.Boolean,
+      label: "No Clip",
     },
     {
       id: "stats",
       type: OptionType.Boolean,
       label: "Show Stats",
+    },
+    {
+      id: "godMode",
+      type: OptionType.Boolean,
+      label: "God Mode",
+    },
+    {
+      id: "speed",
+      type: OptionType.Number,
+      label: "Speed",
+      max: 2,
+      min: 0.01,
+      step: 0.01,
     },
   ],
 }) as Readonly<Record<OptionCategory, OptionComponent[]>>;

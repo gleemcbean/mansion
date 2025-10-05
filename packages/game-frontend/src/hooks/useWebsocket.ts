@@ -26,7 +26,7 @@ export default function useWebsocket() {
   useEffect(() => {
     if (ws) return;
 
-    const _ws = new WebSocket("ws://localhost:8080/ws");
+    const _ws = new WebSocket("wss://tunnel.gche.me/ws");
 
     _ws.onmessage = (event) => {
       try {

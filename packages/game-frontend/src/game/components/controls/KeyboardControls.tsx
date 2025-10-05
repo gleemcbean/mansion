@@ -10,13 +10,14 @@ import {
   RigidBody,
   type RapierRigidBody,
 } from "@react-three/rapier";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import {
   PL_CROUCH_SPEED_MULTIPLIER,
   PL_FLY_SPEED_MULTIPLIER,
   PL_HEIGHT,
   PL_JUMP_FORCE,
+  PL_MAX_STAMINA,
   PL_SPEED,
   PL_SPRINT_SPEED_MULTIPLIER,
   PL_THICKNESS,
@@ -35,7 +36,10 @@ type KeyboardControlsProps = {
 function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const body = useRef<RapierRigidBody>(null);
   const grounded = useRef(true);
+  const [lighting, setLighting] = useState({ value: false, ready: true });
   const lastSent = useRef(0);
+  const lastEnergyDrain = useRef(0);
+  const energy = useRef(100);
   const oldQuat = useRef(new THREE.Quaternion());
   const oldPos = useRef(new THREE.Vector3());
   const { 1: get } = useKeyboardControls();
@@ -51,13 +55,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const sideVector = new THREE.Vector3();
   const euler = new THREE.Euler(0, 0, 0, "YXZ");
 
-  const collider = useRef<THREE.Mesh>(null);
-
-  useEffect(() => {
-    console.log(collider.current);
-  }, [collider.current]);
-
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (!body.current) return;
 
     const sendPosPacket = (data: PlayerGameData) => {
@@ -67,6 +65,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       send(ClientPacketType.PlayerUpdate, { gameData: data });
     };
 
+    const oldEnergy = energy.current;
     const keys = get();
     const forward = Number(keys.forward);
     const backward = Number(keys.backward);
@@ -75,6 +74,33 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
     const sprint = keys.sprint;
     const jump = keys.jump;
     const crouch = keys.crouch && !options.fly;
+    const lightPressed = keys.light;
+
+    if (sprint && !options.godMode) energy.current -= delta * 10;
+    if (lighting.value && !options.godMode) energy.current -= delta * 6;
+    energy.current = Math.max(0, energy.current);
+
+    if (energy.current !== oldEnergy) {
+      lastEnergyDrain.current = Date.now();
+    }
+
+    if (
+      energy.current === oldEnergy &&
+      lastEnergyDrain.current + 1000 < Date.now()
+    ) {
+      energy.current = Math.min(PL_MAX_STAMINA, energy.current + delta * 6);
+    }
+
+    const canSprint = sprint && energy.current > 1;
+    const canLight = lighting.value && energy.current > 0;
+
+    if ((lightPressed && lighting.ready) || (lighting.value && !canLight)) {
+      setLighting((prev) => ({ value: !prev.value, ready: false }));
+    }
+
+    if (!lightPressed && !lighting.ready) {
+      setLighting((prev) => ({ ...prev, ready: true }));
+    }
 
     const vel = body.current.linvel();
     const yVel = vel?.y ?? 0;
@@ -93,11 +119,13 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 
     const currentSpeed =
       PL_SPEED *
-      (sprint ? PL_SPRINT_SPEED_MULTIPLIER : 1) *
+      options.speed *
+      (canSprint ? PL_SPRINT_SPEED_MULTIPLIER : 1) *
       (crouch ? PL_CROUCH_SPEED_MULTIPLIER : 1) *
       (options.fly ? PL_FLY_SPEED_MULTIPLIER : 1);
 
     direction.multiplyScalar(currentSpeed);
+    body.current.setGravityScale(options.fly ? 0 : 1, false);
 
     if (direction.lengthSq() > 0) {
       body.current.wakeUp?.();
@@ -132,12 +160,20 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
     const q = camera.quaternion.clone();
     camera.position.set(t.x, t.y + 0.2, t.z);
 
-    if (!oldQuat.current.equals(q) || !oldPos.current.equals(t)) {
+    if (
+      !oldQuat.current.equals(q) ||
+      !oldPos.current.equals(t) ||
+      !lighting.ready ||
+      oldEnergy !== energy.current
+    ) {
       const newGameData: PlayerGameData = {
         position: [t.x, t.y, t.z],
         quaternion: q,
         crouched: crouch,
         running: sprint,
+        health: 100,
+        energy: energy.current,
+        lighting: lighting.value,
       };
 
       setGameData(newGameData);
@@ -164,12 +200,24 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       position={[spawn[0], 2.8, spawn[1]]}
       friction={0}
     >
-      <CapsuleCollider args={[PL_HEIGHT / 2 - 0.08, PL_THICKNESS]} />
-      <CapsuleCollider
-        args={[0.2, 0.2]}
-        position={[0, -PL_HEIGHT / 2 + 0.08, 0]}
-        onCollisionEnter={() => (grounded.current = true)}
-        onCollisionExit={() => (grounded.current = false)}
+      {!options.noClip && (
+        <React.Fragment>
+          <CapsuleCollider args={[PL_HEIGHT / 2 - 0.08, PL_THICKNESS]} />
+          <CapsuleCollider
+            args={[0.2, 0.2]}
+            position={[0, -PL_HEIGHT / 2 + 0.08, 0]}
+            onCollisionEnter={() => (grounded.current = true)}
+            onCollisionExit={() => (grounded.current = false)}
+          />
+        </React.Fragment>
+      )}
+      <pointLight
+        position={[0, PL_HEIGHT / 2, 0]}
+        intensity={4}
+        distance={8}
+        decay={0.6}
+        color={0xe8a7f0}
+        visible={lighting.value}
       />
     </RigidBody>
   );
@@ -195,6 +243,7 @@ export default function KeyboardControls({ spawn }: KeyboardControlsProps) {
         { name: "jump", keys: keyify(options.up) },
         { name: "sprint", keys: keyify(options.sprint) },
         { name: "crouch", keys: keyify(options.crouch) },
+        { name: "light", keys: keyify(options.light) },
       ]}
     >
       <KeyboardControlsLogic spawn={spawn} />

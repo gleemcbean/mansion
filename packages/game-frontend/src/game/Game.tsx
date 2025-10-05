@@ -9,7 +9,6 @@ import { Physics } from "@react-three/rapier";
 import MapManager from "./components/managers/MapManager";
 import Loading from "@/ui/modals/Loading";
 import useLobby from "@/hooks/useLobby";
-import { Stats } from "@react-three/drei";
 import useClient from "@/hooks/useClient";
 import type { Vec2 } from "@mansion/shared/types/util";
 import React from "react";
@@ -17,6 +16,7 @@ import Menu from "@/ui/modals/Menu";
 import PlayerManager from "./components/managers/PlayerManager";
 import Hud from "@/ui/gui/Hud";
 import type { ModalRef } from "@/ui/components/Modal";
+import Stats from "./components/Stats";
 
 export default function Game() {
   const [options, setOptions] = useState<Partial<Options> | null>(null);
@@ -78,10 +78,7 @@ export default function Game() {
       >
         <perspectiveCamera fov={75} near={0.1} far={1000} />
         <PostProcessing />
-        <ambientLight
-          intensity={Math.PI / 2}
-          color={new THREE.Color(0xe2a8f0)}
-        />
+        <ambientLight intensity={0.2} color={new THREE.Color(0xe2a8f0)} />
         {options.showHelper && <axesHelper args={[50]} />}
         {options.showHelper && <gridHelper args={[100, 100]} />}
         <Physics
@@ -95,7 +92,7 @@ export default function Game() {
           <MapManager />
           <PlayerManager />
         </Physics>
-        {options.stats && <Stats />}
+        <Stats />
       </Canvas>
       <Hud />
       <Menu ref={menuRef} />

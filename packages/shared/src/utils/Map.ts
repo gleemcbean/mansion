@@ -1,5 +1,6 @@
-import type { Door, DoorPoint } from "../types/map";
+import type { Door, DoorPoint, Light } from "../types/map";
 import { CardinalDirection, type Vec2 } from "../types/util";
+import type * as THREE from "three";
 
 type TranslateReturn<T> = T extends undefined
   ? Vec2
@@ -77,6 +78,7 @@ export class Room {
   public doorPoints: DoorPoint[] = [];
   public topology: Vec2[] = [];
   public spawns: Vec2[] = [];
+  public lights: Light[] = [];
 
   public static fromJSON(obj: Object): Room {
     try {
@@ -104,8 +106,25 @@ export class Room {
     y: number,
     direction: CardinalDirection
   ): this {
-    const doorPoint: DoorPoint = { position: [x, y], direction };
-    this.doorPoints.push(doorPoint);
+    this.doorPoints.push({
+      position: [x, y],
+      direction,
+    });
+
+    return this;
+  }
+
+  public addLight(
+    x: number,
+    y: number,
+    z: number,
+    color?: THREE.ColorRepresentation
+  ) {
+    this.lights.push({
+      position: [x, y, z],
+      color,
+    });
+
     return this;
   }
 
@@ -134,6 +153,7 @@ export class Room {
     room.topology = [...this.topology];
     room.spawns = [...this.spawns];
     room.doorPoints = [...this.doorPoints];
+    room.lights = [...this.lights];
     return room;
   }
 
@@ -196,6 +216,7 @@ export class PositionedRoom extends Room {
     this.topology = [...room.topology];
     this.spawns = [...room.spawns];
     this.doorPoints = [...room.doorPoints];
+    this.lights = [...room.lights];
     this.position = position;
     this.direction = direction;
   }
@@ -316,5 +337,15 @@ export class PositionedRoom extends Room {
 
   public get t_spawns(): Vec2[] {
     return this.spawns.map((vec) => this.translate(vec)) as Vec2[];
+  }
+
+  public get t_lights(): Light[] {
+    return this.lights.map((light) => {
+      light = { ...light };
+      let [lx, ly, lz] = light.position;
+      [lx, lz] = this.translate([lx, lz]);
+      light.position = [lx, ly, lz];
+      return light;
+    });
   }
 }
