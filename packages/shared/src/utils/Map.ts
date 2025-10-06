@@ -118,11 +118,17 @@ export class Room {
     x: number,
     y: number,
     z: number,
-    color?: THREE.ColorRepresentation
+    options: {
+      color?: THREE.ColorRepresentation;
+      decay?: number;
+      intensity?: number;
+    } = {}
   ) {
     this.lights.push({
       position: [x, y, z],
-      color,
+      color: options.color,
+      decay: options.decay,
+      intensity: options.intensity,
     });
 
     return this;

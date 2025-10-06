@@ -53,20 +53,6 @@ export default class Generators {
       map.rooms.push(room);
       if (map.rooms.length >= M_MAX_ROOMS) return map;
 
-      console.log(
-        room.name,
-        CardinalDirection[room.direction],
-        room.t_doorPoints.map((d) => ({
-          pos: d.position,
-          dir: CardinalDirection[d.direction],
-        }))
-      );
-      console.log(
-        `new Polygon([${room.t_topology
-          .map(([x, y]) => `new Point(${x * 10}, ${y * 10})`)
-          .join(", ")}]);`
-      );
-
       room.shuffledDoorPoints().forEach((doorPoint) => {
         const foundDoor = map.doorAt(doorPoint.position);
 
@@ -92,10 +78,9 @@ export default class Generators {
         });
 
         do {
-          if (sample.length === 0) break;
-
           const candidate = randomRoom(sample);
           sample = sample.filter((r) => r.id !== candidate.id);
+          if (!candidate) continue;
 
           candidate.shuffledDoorPoints().forEach((candidateDoorPoint) => {
             if (positioned) return;
@@ -121,13 +106,16 @@ export default class Generators {
               positioned = positionedCandidate;
             }
           });
-
-          if (positioned) break;
         } while (!positioned && sample.length > 0);
 
         if (positioned) {
           door.openable = true;
-          available.splice(available.indexOf(positioned), 1);
+
+          available.splice(
+            available.findIndex((r) => r.id === positioned!.id),
+            1
+          );
+
           map = populate(positioned, map, depth + 1);
         }
       });

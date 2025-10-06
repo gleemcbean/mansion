@@ -8,7 +8,7 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
     .addDoorPoint(1.5, 0, CardinalDirection.South)
     .addDoorPoint(5.5, 4, CardinalDirection.North)
     .addSpawn(2, 3)
-    .addLight(6.5, 2, 3.5, 0xe8a7f0),
+    .addLight(6.5, 2, 3.5),
   new Room("attics", "Attics", 2)
     .setTopology([0, 0], [5, 0], [5, 2], [3, 2], [3, 5], [0, 5])
     .addDoorPoint(0, 1.5, CardinalDirection.East)
@@ -28,7 +28,15 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
     .addDoorPoint(6.5, 0, CardinalDirection.South)
     .addDoorPoint(9, 1.5, CardinalDirection.West)
     .addDoorPoint(6.5, 3, CardinalDirection.North)
-    .addDoorPoint(2.5, 3, CardinalDirection.North),
+    .addDoorPoint(2.5, 3, CardinalDirection.North)
+    .addLight(1.5, 1.6, 0.5, { intensity: 1 })
+    .addLight(1.5, 1.6, 2.5, { intensity: 1 })
+    .addLight(3.5, 1.6, 0.5, { intensity: 1 })
+    .addLight(3.5, 1.6, 2.5, { intensity: 1 })
+    .addLight(5.5, 1.6, 0.5, { intensity: 1 })
+    .addLight(5.5, 1.6, 2.5, { intensity: 1 })
+    .addLight(7.5, 1.6, 0.5, { intensity: 1 })
+    .addLight(7.5, 1.6, 2.5, { intensity: 1 }),
   new Room("generator", "Generator")
     .setTopology([0, 0], [5, 0], [5, 5], [3, 5], [3, 3], [2, 3], [2, 5], [0, 5])
     .addDoorPoint(0, 1.5, CardinalDirection.East)

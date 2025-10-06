@@ -15,4 +15,6 @@ export type Door = {
 export type Light = {
   position: Vec3;
   color?: THREE.ColorRepresentation;
+  intensity?: number;
+  decay?: number;
 };

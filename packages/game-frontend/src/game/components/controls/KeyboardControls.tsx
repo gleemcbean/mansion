@@ -197,7 +197,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       lockRotations={true}
       linearDamping={0.5}
       angularDamping={1}
-      position={[spawn[0], 2.8, spawn[1]]}
+      position={[spawn[0], PL_HEIGHT + 0.2, spawn[1]]}
       friction={0}
     >
       {!options.noClip && (

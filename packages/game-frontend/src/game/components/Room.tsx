@@ -1,4 +1,3 @@
-import useClient from "@/hooks/useClient";
 import type { PositionedRoom } from "@mansion/shared/utils/Map";
 import { Gltf } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
@@ -9,8 +8,6 @@ type RoomProps = {
 };
 
 export default function Room({ data }: RoomProps) {
-  const { options } = useClient();
-
   const {
     position: [x, z],
     rotationY,
@@ -33,9 +30,10 @@ export default function Room({ data }: RoomProps) {
       {lights.map((light) => (
         <pointLight
           position={light.position}
-          color={light.color}
-          decay={0.8}
-          intensity={4}
+          color={light.color ?? 0xe8a7f0}
+          decay={light.decay ?? 1.5}
+          intensity={light.intensity ?? 4}
+          castShadow
         />
       ))}
     </RigidBody>

@@ -13,8 +13,6 @@ export default function PlayerManager() {
   const [players, setPlayers] = useState(_players);
 
   useEffect(() => {
-    console.log(players);
-
     const unsubscribes = [
       addHandler(ServerPacketType.PlayerJoined, ({ player }) => {
         addPlayer(player);

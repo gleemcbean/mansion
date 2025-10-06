@@ -8,7 +8,7 @@ export const PL_SPEED = 3.2;
 export const PL_SPRINT_SPEED_MULTIPLIER = 1.5;
 export const PL_CROUCH_SPEED_MULTIPLIER = 0.5;
 export const PL_FLY_SPEED_MULTIPLIER = 2;
-export const PL_JUMP_FORCE = 4.2;
+export const PL_JUMP_FORCE = 3.2;
 
 // FOV
 export const PL_FOV = 75;

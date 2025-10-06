@@ -1,5 +1,5 @@
 import { Canvas, events } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import PostProcessing from "./components/shaders/PostProcessing";
 import { DEFAULT_OPTIONS, type Options } from "@/constants/Options";
@@ -17,6 +17,8 @@ import PlayerManager from "./components/managers/PlayerManager";
 import Hud from "@/ui/gui/Hud";
 import type { ModalRef } from "@/ui/components/Modal";
 import Stats from "./components/Stats";
+import { Preload } from "@react-three/drei";
+import THREELoading from "./Loading";
 
 export default function Game() {
   const [options, setOptions] = useState<Partial<Options> | null>(null);
@@ -76,23 +78,26 @@ export default function Game() {
           needsUpdate: false,
         }}
       >
-        <perspectiveCamera fov={75} near={0.1} far={1000} />
-        <PostProcessing />
-        <ambientLight intensity={0.2} color={new THREE.Color(0xe2a8f0)} />
-        {options.showHelper && <axesHelper args={[50]} />}
-        {options.showHelper && <gridHelper args={[100, 100]} />}
-        <Physics
-          gravity={[0, options.fly ? 0 : -25, 0]}
-          debug={options.showHelper}
-          numSolverIterations={8}
-          numAdditionalFrictionIterations={8}
-        >
-          <KeyboardControls spawn={spawn} />
-          <PointerLockControls />
-          <MapManager />
-          <PlayerManager />
-        </Physics>
-        <Stats />
+        <Suspense fallback={<THREELoading />}>
+          <perspectiveCamera fov={75} near={0.1} far={1000} />
+          <PostProcessing />
+          <ambientLight intensity={0.2} color={new THREE.Color(0xe2a8f0)} />
+          {options.showHelper && <axesHelper args={[50]} />}
+          {options.showHelper && <gridHelper args={[100, 100]} />}
+          <Physics
+            gravity={[0, options.fly ? 0 : -22, 0]}
+            debug={options.showHelper}
+            numSolverIterations={8}
+            numAdditionalFrictionIterations={8}
+          >
+            <KeyboardControls spawn={spawn} />
+            <PointerLockControls />
+            <MapManager />
+            <PlayerManager />
+          </Physics>
+          <Stats />
+          <Preload all />
+        </Suspense>
       </Canvas>
       <Hud />
       <Menu ref={menuRef} />
