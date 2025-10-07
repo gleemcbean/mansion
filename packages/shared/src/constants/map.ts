@@ -44,6 +44,9 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
   new Room("closet", "Closet", 3)
     .setTopology([0, 0], [2, 0], [2, 1.5], [0, 1.5])
     .addDoorPoint(0.5, 0, CardinalDirection.South),
+  new Room("garage", "Garage", 2)
+    .setTopology([0, 0], [4, 0], [4, 6], [0, 6])
+    .addDoorPoint(2.5, 6, CardinalDirection.North)
 ]);
 
 export const M_MAX_ROOMS = 15;

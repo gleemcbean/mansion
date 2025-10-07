@@ -32,23 +32,25 @@ export default function Hud() {
 
   return (
     <div className={styles.container}>
-      <Minimap />
-      <div className={styles.progressions}>
-        <ProgressBar
-          color="#39dde3"
-          value={gameData.energy}
-          maxValue={PL_MAX_HEALTH}
-          height={20}
-          Icon={FaBoltLightning}
-          iconSize={20}
-        />
-        <ProgressBar
-          color="#e33941"
-          value={gameData.health}
-          maxValue={PL_MAX_STAMINA}
-          Icon={FaHeart}
-          iconSize={20}
-        />
+      <div className={styles.content}>
+        <Minimap />
+        <div className={styles.progressions}>
+          <ProgressBar
+            color="#39dde3"
+            value={gameData.energy}
+            maxValue={PL_MAX_HEALTH}
+            height={20}
+            Icon={FaBoltLightning}
+            iconSize={20}
+          />
+          <ProgressBar
+            color="#e33941"
+            value={gameData.health}
+            maxValue={PL_MAX_STAMINA}
+            Icon={FaHeart}
+            iconSize={20}
+          />
+        </div>
       </div>
     </div>
   );
