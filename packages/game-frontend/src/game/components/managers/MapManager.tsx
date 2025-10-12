@@ -3,6 +3,7 @@ import useLobby from "@/hooks/useLobby";
 import Room from "../Room";
 import Door from "../Door";
 import { GameMap } from "@mansion/shared/utils/Map";
+import { RigidBody } from "@react-three/rapier";
 
 export default function RoomManager() {
   const { metadata } = useLobby();
@@ -10,6 +11,12 @@ export default function RoomManager() {
 
   return (
     <React.Fragment>
+      <RigidBody type="fixed">
+        <mesh position={[0, -2.51, 0]}>
+          <boxGeometry args={[100, 5, 100]} />
+          <meshBasicMaterial color="white" transparent />
+        </mesh>
+      </RigidBody>
       {map.rooms.map((room, i) => (
         <Room key={i} data={room} />
       ))}

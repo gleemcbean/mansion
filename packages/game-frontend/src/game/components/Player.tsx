@@ -10,6 +10,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { Quat, Vec3 } from "@mansion/shared/types/util";
 import {
+  PL_CROUCH_HEIGHT,
   PL_HEIGHT,
   PL_PROXIMITY_CHAT_DISTANCE,
   PL_THICKNESS,
@@ -47,6 +48,11 @@ export default function Player({ playerData, username }: PlayerProps) {
   const bodyRef = useRef<RapierRigidBody>(null);
   const nameTagRef = useRef<THREE.Object3D>(null);
   const capLightRef = useRef<THREE.PointLight>(null);
+
+  const height = useMemo(
+    () => (playerData.gameData?.crouched ? PL_CROUCH_HEIGHT : PL_HEIGHT),
+    [playerData.gameData?.crouched]
+  );
 
   const getMaterialByName = (
     scene: THREE.Object3D,
@@ -207,7 +213,7 @@ export default function Player({ playerData, username }: PlayerProps) {
           </React.Fragment>
         )}
       </group>
-      <CapsuleCollider args={[PL_HEIGHT / 2, PL_THICKNESS]} friction={0} />
+      <CapsuleCollider args={[height / 2, PL_THICKNESS]} friction={0} />
       {options.showHelper && (
         <mesh>
           <sphereGeometry args={[PL_PROXIMITY_CHAT_DISTANCE, 8, 8]} />

@@ -17,4 +17,5 @@ export type Light = {
   color?: THREE.ColorRepresentation;
   intensity?: number;
   decay?: number;
+  target?: Vec3 | null;
 };

@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import glsl from "vite-plugin-glsl";
 // import obfuscatorPlugin from "vite-plugin-javascript-obfuscator";
 // import compressionPlugin from "vite-plugin-compression";
 
@@ -8,6 +9,12 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [
     react(),
+    glsl({
+      include: ["**/*.glsl"],
+      defaultExtension: "glsl",
+      warnDuplicatedImports: true,
+      minify: true,
+    }),
     // compressionPlugin(),
     // obfuscatorPlugin({
     //   options: {

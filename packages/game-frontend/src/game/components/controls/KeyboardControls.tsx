@@ -10,17 +10,20 @@ import {
   RigidBody,
   type RapierRigidBody,
 } from "@react-three/rapier";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import {
   PL_CROUCH_SPEED_MULTIPLIER,
   PL_FLY_SPEED_MULTIPLIER,
+  PL_FOV,
   PL_HEIGHT,
   PL_JUMP_FORCE,
   PL_MAX_STAMINA,
   PL_SPEED,
+  PL_SPRINT_FOV,
   PL_SPRINT_SPEED_MULTIPLIER,
   PL_THICKNESS,
+  PL_EYE_DISTANCE,
 } from "@mansion/shared/constants/player";
 import useClient from "@/hooks/useClient";
 import useWebsocket from "@/hooks/useWebsocket";
@@ -35,13 +38,17 @@ type KeyboardControlsProps = {
 
 function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const body = useRef<RapierRigidBody>(null);
-  const grounded = useRef(true);
   const [lighting, setLighting] = useState({ value: false, ready: true });
   const lastSent = useRef(0);
   const lastEnergyDrain = useRef(0);
   const energy = useRef(100);
+  // const height = useRef(PL_HEIGHT);
+  // const targetHeight = useRef(PL_HEIGHT);
+  const fovRef = useRef(PL_FOV);
+  const targetFovRef = useRef(PL_FOV);
   const oldQuat = useRef(new THREE.Quaternion());
   const oldPos = useRef(new THREE.Vector3());
+  const raycaster = useRef(new THREE.Raycaster());
   const { 1: get } = useKeyboardControls();
   const { camera } = useThree();
   const { options, room, setRoom, setGameData } = useClient();
@@ -55,7 +62,20 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const sideVector = new THREE.Vector3();
   const euler = new THREE.Euler(0, 0, 0, "YXZ");
 
-  useFrame((_, delta) => {
+  useEffect(() => {
+    body.current?.setTranslation(
+      { x: spawn[0], y: PL_HEIGHT + 1, z: spawn[1] },
+      false
+    );
+
+    raycaster.current.far =
+      PL_HEIGHT / 2 + PL_THICKNESS + PL_EYE_DISTANCE + 0.05;
+
+    raycaster.current.near = 0;
+    raycaster.current.params.Mesh = { side: THREE.FrontSide };
+  }, []);
+
+  useFrame(({ scene }, delta) => {
     if (!body.current) return;
 
     const sendPosPacket = (data: PlayerGameData) => {
@@ -75,6 +95,8 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
     const jump = keys.jump;
     const crouch = keys.crouch && !options.fly;
     const lightPressed = keys.light;
+
+    // targetHeight.current = crouch ? PL_CROUCH_HEIGHT : PL_HEIGHT;
 
     if (sprint && !options.godMode) energy.current -= delta * 10;
     if (lighting.value && !options.godMode) energy.current -= delta * 6;
@@ -129,6 +151,10 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 
     if (direction.lengthSq() > 0) {
       body.current.wakeUp?.();
+
+      targetFovRef.current =
+        sprint && energy.current > 0 ? PL_SPRINT_FOV : PL_FOV;
+
       body.current.setLinvel(
         {
           x: direction.x,
@@ -138,6 +164,8 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
         true
       );
     } else {
+      if (!sprint) targetFovRef.current = PL_FOV;
+
       body.current.setLinvel(
         {
           x: direction.x * 0.9,
@@ -148,17 +176,24 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       );
     }
 
-    if (jump && grounded.current) {
+    const origin = camera.getWorldPosition(new THREE.Vector3());
+    const dir = new THREE.Vector3(0, -1, 0).normalize();
+    raycaster.current.set(origin, dir);
+    const candidates: THREE.Object3D[] = [];
+    scene.traverse((obj) => candidates.push(obj));
+    const hits = raycaster.current.intersectObjects(candidates, true);
+    const grounded = !!hits[0];
+
+    if (jump && grounded && yVel < 0.001) {
       body.current.applyImpulse(
-        { x: direction.x, y: PL_JUMP_FORCE, z: 0 },
+        { x: direction.x, y: PL_JUMP_FORCE, z: direction.z },
         true
       );
-      grounded.current = false;
     }
 
     const t = body.current.translation();
     const q = camera.quaternion.clone();
-    camera.position.set(t.x, t.y + 0.2, t.z);
+    camera.position.set(t.x, t.y + PL_EYE_DISTANCE, t.z);
 
     if (
       !oldQuat.current.equals(q) ||
@@ -183,6 +218,12 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
     oldQuat.current.copy(q);
     oldPos.current.copy(t);
 
+    if ("fov" in camera) {
+      fovRef.current += (targetFovRef.current - fovRef.current) * delta * 10;
+      camera.fov = fovRef.current;
+      camera.updateProjectionMatrix();
+    }
+
     map.rooms.forEach((r) => {
       if (room === r.name || !r.pointIn([t.x, t.z])) return;
       setRoom(r.name);
@@ -197,25 +238,16 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       lockRotations={true}
       linearDamping={0.5}
       angularDamping={1}
-      position={[spawn[0], PL_HEIGHT + 0.2, spawn[1]]}
       friction={0}
     >
       {!options.noClip && (
-        <React.Fragment>
-          <CapsuleCollider args={[PL_HEIGHT / 2 - 0.08, PL_THICKNESS]} />
-          <CapsuleCollider
-            args={[0.2, 0.2]}
-            position={[0, -PL_HEIGHT / 2 + 0.08, 0]}
-            onCollisionEnter={() => (grounded.current = true)}
-            onCollisionExit={() => (grounded.current = false)}
-          />
-        </React.Fragment>
+        <CapsuleCollider args={[PL_HEIGHT / 2, PL_THICKNESS]} />
       )}
       <pointLight
         position={[0, PL_HEIGHT / 2, 0]}
-        intensity={4}
+        intensity={6}
         distance={8}
-        decay={0.6}
+        decay={0.4}
         color={0xe8a7f0}
         visible={lighting.value}
       />

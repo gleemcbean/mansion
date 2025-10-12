@@ -4,16 +4,20 @@
   @include variables.crt-overlay;
 
   position: fixed;
+  inset: 0;
+  width: 100dvw;
+  height: 100dvh;
   pointer-events: none;
 
   .content {
+    position: fixed;
     width: 100dvw;
     height: 100dvh;
     inset: 2rem;
 
     .progressions {
       position: fixed;
-      bottom: 0;
+      bottom: 2rem;
       display: flex;
       flex-direction: column;
       gap: 0.5rem;

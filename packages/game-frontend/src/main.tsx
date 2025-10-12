@@ -3,6 +3,10 @@ import App from "./App";
 import useWebsocket from "./hooks/useWebsocket";
 import Loading from "./ui/modals/Loading";
 import "./ui/styles/global.scss";
+import { extend } from "@react-three/fiber";
+import { ShaderPass } from "postprocessing";
+
+extend({ ShaderPass });
 
 function Root() {
   const { open } = useWebsocket();

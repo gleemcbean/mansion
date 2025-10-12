@@ -5,7 +5,7 @@ import {
   ROOMS,
 } from "@mansion/shared/constants/map";
 import type { Door } from "@mansion/shared/types/map";
-import { CardinalDirection, type Vec2 } from "@mansion/shared/types/util";
+import type { Vec2 } from "@mansion/shared/types/util";
 import { GameMap, PositionedRoom, Room } from "@mansion/shared/utils/Map";
 
 export default class Generators {

@@ -1,5 +1,5 @@
 import type { Door, DoorPoint, Light } from "../types/map";
-import { CardinalDirection, type Vec2 } from "../types/util";
+import { CardinalDirection, type Vec2, type Vec3 } from "../types/util";
 import type * as THREE from "three";
 
 type TranslateReturn<T> = T extends undefined
@@ -122,6 +122,7 @@ export class Room {
       color?: THREE.ColorRepresentation;
       decay?: number;
       intensity?: number;
+      target?: Vec3;
     } = {}
   ) {
     this.lights.push({
@@ -129,6 +130,7 @@ export class Room {
       color: options.color,
       decay: options.decay,
       intensity: options.intensity,
+      target: options.target,
     });
 
     return this;
@@ -351,6 +353,13 @@ export class PositionedRoom extends Room {
       let [lx, ly, lz] = light.position;
       [lx, lz] = this.translate([lx, lz]);
       light.position = [lx, ly, lz];
+
+      if (light.target) {
+        let [tx, ty, tz] = light.target;
+        [tx, tz] = this.translate([lx + tx, lz + tz]);
+        light.target = [tx, ty, tz];
+      }
+
       return light;
     });
   }

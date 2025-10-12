@@ -19,6 +19,7 @@ import type { ModalRef } from "@/ui/components/Modal";
 import Stats from "./components/Stats";
 import { Preload } from "@react-three/drei";
 import THREELoading from "./Loading";
+import Selector from "./components/controls/Selector";
 
 export default function Game() {
   const [options, setOptions] = useState<Partial<Options> | null>(null);
@@ -55,9 +56,10 @@ export default function Game() {
         flat
         linear
         scene={{
-          fog: new THREE.FogExp2(0x170312, 0.25),
+          fog: new THREE.FogExp2(0x170312, 0.18),
           background: new THREE.Color(0x170312),
         }}
+        camera={{ near: 0.001, far: 10, fov: 90 }}
         gl={{
           antialias: false,
           powerPreference: "high-performance",
@@ -71,17 +73,11 @@ export default function Game() {
         }}
         events={events}
         dpr={options.dpr ?? DEFAULT_OPTIONS.dpr}
-        shadows={{
-          enabled: options.shadows ?? DEFAULT_OPTIONS.shadows,
-          type: THREE.PCFSoftShadowMap,
-          autoUpdate: true,
-          needsUpdate: false,
-        }}
+        shadows={{ type: THREE.BasicShadowMap }}
       >
         <Suspense fallback={<THREELoading />}>
-          <perspectiveCamera fov={75} near={0.1} far={1000} />
           <PostProcessing />
-          <ambientLight intensity={0.2} color={new THREE.Color(0xe2a8f0)} />
+          <ambientLight intensity={0.8} color={new THREE.Color(0xe9b5f5)} />
           {options.showHelper && <axesHelper args={[50]} />}
           {options.showHelper && <gridHelper args={[100, 100]} />}
           <Physics
@@ -91,6 +87,11 @@ export default function Game() {
             numAdditionalFrictionIterations={8}
           >
             <KeyboardControls spawn={spawn} />
+            <Selector
+              // onHit={(obj) => console.log(obj)}
+              distance={2}
+              filter={(obj) => obj.name === "Door"}
+            />
             <PointerLockControls />
             <MapManager />
             <PlayerManager />
