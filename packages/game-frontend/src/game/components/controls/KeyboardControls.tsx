@@ -73,12 +73,14 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       },
       false
     );
+  }, []);
 
+  useEffect(() => {
     jRaycaster.current.far =
       targetHeight.current / 2 + PL_THICKNESS + PL_EYE_DISTANCE + 0.05;
 
     cRaycaster.current.far =
-      targetHeight.current / 2 + PL_THICKNESS - PL_EYE_DISTANCE + 0.05;
+      PL_HEIGHT / 2 + PL_THICKNESS - PL_EYE_DISTANCE + 0.05;
 
     jRaycaster.current.near = cRaycaster.current.near = 0;
 
@@ -149,11 +151,28 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
     euler.set(0, camera.rotation.y, 0);
     direction.applyEuler(euler);
 
+    const candidates: THREE.Object3D[] = [];
+    scene.traverse((obj) => candidates.push(obj));
+
+    let origin = camera.getWorldPosition(new THREE.Vector3());
+    let dir = new THREE.Vector3(0, 1, 0).normalize();
+    cRaycaster.current.set(origin, dir);
+    let hits = cRaycaster.current.intersectObjects(candidates, true);
+    const canDecrouch = !hits[0];
+
+    if (crouch || (!crouch && !canDecrouch)) {
+      targetHeight.current = PL_CROUCH_HEIGHT;
+    } else {
+      targetHeight.current = PL_HEIGHT;
+    }
+
+    const crouched = targetHeight.current === PL_CROUCH_HEIGHT;
+
     const currentSpeed =
       PL_SPEED *
       options.speed *
       (canSprint ? PL_SPRINT_SPEED_MULTIPLIER : 1) *
-      (crouch ? PL_CROUCH_SPEED_MULTIPLIER : 1) *
+      (crouched ? PL_CROUCH_SPEED_MULTIPLIER : 1) *
       (options.fly ? PL_FLY_SPEED_MULTIPLIER : 1);
 
     direction.multiplyScalar(currentSpeed);
@@ -186,13 +205,10 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       );
     }
 
-    const candidates: THREE.Object3D[] = [];
-    scene.traverse((obj) => candidates.push(obj));
-
-    const jOrigin = camera.getWorldPosition(new THREE.Vector3());
-    const jDir = new THREE.Vector3(0, -1, 0).normalize();
-    jRaycaster.current.set(jOrigin, jDir);
-    let hits = jRaycaster.current.intersectObjects(candidates, true);
+    origin = camera.getWorldPosition(new THREE.Vector3());
+    dir = new THREE.Vector3(0, -1, 0).normalize();
+    jRaycaster.current.set(origin, dir);
+    hits = jRaycaster.current.intersectObjects(candidates, true);
     const grounded = !!hits[0];
 
     if (jump && grounded && yVel < 0.001) {
@@ -201,18 +217,6 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
         true
       );
     }
-
-    const cOrigin = camera.getWorldPosition(new THREE.Vector3());
-    const cDir = new THREE.Vector3(0, 1, 0).normalize();
-    cRaycaster.current.set(cOrigin, cDir);
-    hits = cRaycaster.current.intersectObjects(candidates, true);
-    const canDecrouch = !!hits[0];
-
-    if (crouch) console.log(canDecrouch);
-
-    targetHeight.current = PL_HEIGHT;
-    if (crouch || (!crouch && !canDecrouch))
-      targetHeight.current = PL_CROUCH_HEIGHT;
 
     setHeight((prev) => prev + (targetHeight.current - prev) * delta * 5);
 

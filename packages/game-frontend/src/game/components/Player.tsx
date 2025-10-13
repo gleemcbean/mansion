@@ -176,8 +176,9 @@ export default function Player({ playerData, username }: PlayerProps) {
     <RigidBody type="kinematicPosition" colliders={false} ref={bodyRef}>
       {options.hud && (
         <Text
-          position={[0, (PL_HEIGHT / 4) * 3, 0]}
-          fontSize={0.1}
+          position={[0, PL_HEIGHT / 2 + PL_THICKNESS + 0.2, 0]}
+          fontSize={0.12}
+          fontWeight={800}
           color="white"
           anchorX="center"
           anchorY="middle"
@@ -186,7 +187,10 @@ export default function Player({ playerData, username }: PlayerProps) {
           {username}
         </Text>
       )}
-      <group position={[0, -PL_HEIGHT / 2 - 0.3, 0]} rotation={[0, Math.PI, 0]}>
+      <group
+        position={[0, -PL_HEIGHT / 2 - PL_THICKNESS, 0]}
+        rotation={[0, Math.PI, 0]}
+      >
         <primitive object={character} />
         {playerData.gameData!.lighting && (
           <React.Fragment>
@@ -195,13 +199,6 @@ export default function Player({ playerData, username }: PlayerProps) {
               distance={10}
               color={playerData.mushroomCapColor}
               ref={capLightRef}
-            />
-            <pointLight
-              position={[0, PL_HEIGHT / 2, 0]}
-              intensity={4}
-              distance={8}
-              decay={0.6}
-              color={0xe8a7f0}
             />
             <Sparkles
               count={100}
