@@ -24,6 +24,7 @@ import {
   PL_SPRINT_SPEED_MULTIPLIER,
   PL_THICKNESS,
   PL_EYE_DISTANCE,
+  PL_CROUCH_HEIGHT,
 } from "@mansion/shared/constants/player";
 import useClient from "@/hooks/useClient";
 import useWebsocket from "@/hooks/useWebsocket";
@@ -39,16 +40,17 @@ type KeyboardControlsProps = {
 function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const body = useRef<RapierRigidBody>(null);
   const [lighting, setLighting] = useState({ value: false, ready: true });
+  const [height, setHeight] = useState(PL_HEIGHT);
+  const targetHeight = useRef(PL_HEIGHT);
   const lastSent = useRef(0);
   const lastEnergyDrain = useRef(0);
   const energy = useRef(100);
-  // const height = useRef(PL_HEIGHT);
-  // const targetHeight = useRef(PL_HEIGHT);
   const fovRef = useRef(PL_FOV);
   const targetFovRef = useRef(PL_FOV);
   const oldQuat = useRef(new THREE.Quaternion());
   const oldPos = useRef(new THREE.Vector3());
-  const raycaster = useRef(new THREE.Raycaster());
+  const jRaycaster = useRef(new THREE.Raycaster());
+  const cRaycaster = useRef(new THREE.Raycaster());
   const { 1: get } = useKeyboardControls();
   const { camera } = useThree();
   const { options, room, setRoom, setGameData } = useClient();
@@ -64,16 +66,26 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 
   useEffect(() => {
     body.current?.setTranslation(
-      { x: spawn[0], y: PL_HEIGHT + 1, z: spawn[1] },
+      {
+        x: spawn[0],
+        y: targetHeight.current / 2 + PL_THICKNESS + 0.1,
+        z: spawn[1],
+      },
       false
     );
 
-    raycaster.current.far =
-      PL_HEIGHT / 2 + PL_THICKNESS + PL_EYE_DISTANCE + 0.05;
+    jRaycaster.current.far =
+      targetHeight.current / 2 + PL_THICKNESS + PL_EYE_DISTANCE + 0.05;
 
-    raycaster.current.near = 0;
-    raycaster.current.params.Mesh = { side: THREE.FrontSide };
-  }, []);
+    cRaycaster.current.far =
+      targetHeight.current / 2 + PL_THICKNESS - PL_EYE_DISTANCE + 0.05;
+
+    jRaycaster.current.near = cRaycaster.current.near = 0;
+
+    jRaycaster.current.params.Mesh = cRaycaster.current.params.Mesh = {
+      side: THREE.FrontSide,
+    };
+  }, [targetHeight.current]);
 
   useFrame(({ scene }, delta) => {
     if (!body.current) return;
@@ -95,8 +107,6 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
     const jump = keys.jump;
     const crouch = keys.crouch && !options.fly;
     const lightPressed = keys.light;
-
-    // targetHeight.current = crouch ? PL_CROUCH_HEIGHT : PL_HEIGHT;
 
     if (sprint && !options.godMode) energy.current -= delta * 10;
     if (lighting.value && !options.godMode) energy.current -= delta * 6;
@@ -176,12 +186,13 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       );
     }
 
-    const origin = camera.getWorldPosition(new THREE.Vector3());
-    const dir = new THREE.Vector3(0, -1, 0).normalize();
-    raycaster.current.set(origin, dir);
     const candidates: THREE.Object3D[] = [];
     scene.traverse((obj) => candidates.push(obj));
-    const hits = raycaster.current.intersectObjects(candidates, true);
+
+    const jOrigin = camera.getWorldPosition(new THREE.Vector3());
+    const jDir = new THREE.Vector3(0, -1, 0).normalize();
+    jRaycaster.current.set(jOrigin, jDir);
+    let hits = jRaycaster.current.intersectObjects(candidates, true);
     const grounded = !!hits[0];
 
     if (jump && grounded && yVel < 0.001) {
@@ -190,6 +201,20 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
         true
       );
     }
+
+    const cOrigin = camera.getWorldPosition(new THREE.Vector3());
+    const cDir = new THREE.Vector3(0, 1, 0).normalize();
+    cRaycaster.current.set(cOrigin, cDir);
+    hits = cRaycaster.current.intersectObjects(candidates, true);
+    const canDecrouch = !!hits[0];
+
+    if (crouch) console.log(canDecrouch);
+
+    targetHeight.current = PL_HEIGHT;
+    if (crouch || (!crouch && !canDecrouch))
+      targetHeight.current = PL_CROUCH_HEIGHT;
+
+    setHeight((prev) => prev + (targetHeight.current - prev) * delta * 5);
 
     const t = body.current.translation();
     const q = camera.quaternion.clone();
@@ -240,11 +265,9 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       angularDamping={1}
       friction={0}
     >
-      {!options.noClip && (
-        <CapsuleCollider args={[PL_HEIGHT / 2, PL_THICKNESS]} />
-      )}
+      {!options.noClip && <CapsuleCollider args={[height / 2, PL_THICKNESS]} />}
       <pointLight
-        position={[0, PL_HEIGHT / 2, 0]}
+        position={[0, height / 2, 0]}
         intensity={6}
         distance={8}
         decay={0.4}
