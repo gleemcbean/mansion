@@ -37,6 +37,8 @@ type KeyboardControlsProps = {
   spawn: Vec2;
 };
 
+const JUMP_TIMEOUT = 500;
+
 function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const body = useRef<RapierRigidBody>(null);
   const [lighting, setLighting] = useState({ value: false, ready: true });
@@ -51,6 +53,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const oldPos = useRef(new THREE.Vector3());
   const jRaycaster = useRef(new THREE.Raycaster());
   const cRaycaster = useRef(new THREE.Raycaster());
+  const canJump = useRef(true);
   const { 1: get } = useKeyboardControls();
   const { camera } = useThree();
   const { options, room, setRoom, setGameData } = useClient();
@@ -211,11 +214,14 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
     hits = jRaycaster.current.intersectObjects(candidates, true);
     const grounded = !!hits[0];
 
-    if (jump && grounded && yVel < 0.001) {
+    if (canJump.current && jump && grounded && yVel < 0.001) {
       body.current.applyImpulse(
         { x: direction.x, y: PL_JUMP_FORCE, z: direction.z },
         true
       );
+
+      canJump.current = false;
+      setTimeout(() => (canJump.current = true), JUMP_TIMEOUT);
     }
 
     setHeight((prev) => prev + (targetHeight.current - prev) * delta * 5);
@@ -233,7 +239,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       const newGameData: PlayerGameData = {
         position: [t.x, t.y, t.z],
         quaternion: q,
-        crouched: crouch,
+        crouched: crouched,
         running: sprint,
         health: 100,
         energy: energy.current,

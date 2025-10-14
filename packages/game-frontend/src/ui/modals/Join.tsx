@@ -19,8 +19,9 @@ export default forwardRef<ModalRef>((_props, ref) => {
 
   useEffect(() => {
     const unsubscribes = [
-      addHandler(ServerPacketType.Error, ({ message }) => {
-        alert(message);
+      addHandler(ServerPacketType.InvalidCode, () => {
+        setCode("");
+        alert("Invalid code");
       }),
       addHandler(
         ServerPacketType.GameJoined,

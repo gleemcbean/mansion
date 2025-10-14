@@ -12,9 +12,7 @@ export default new EventHandler(ClientPacketType.JoinGame, (ws, { code }) => {
   const lobby = lobbies.get(code);
 
   if (!lobby) {
-    return ws.send(
-      Packet.create(ServerPacketType.Error, { message: "Lobby not found." })
-    );
+    return ws.send(Packet.create(ServerPacketType.InvalidCode));
   }
 
   lobby.addPlayer({

@@ -14,17 +14,50 @@ import { LobbyState } from "@mansion/shared/types/lobby";
 export default function App() {
   const { addHandler, send } = useWebsocket();
   const { setClient, client } = useClient();
-  const { metadata } = useLobby();
+  const { setMetadata, fillPlayers, metadata } = useLobby();
+
+  function getAndDeleteCookie(name: string) {
+    const value =
+      document.cookie
+        .split("; ")
+        .find((r) => r.startsWith(`${name}=`))
+        ?.split("=")[1] ?? null;
+
+    if (value !== null) {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+    }
+
+    return value ? decodeURIComponent(value) : null;
+  }
 
   useEffect(() => {
-    const unsubscribe = addHandler(ServerPacketType.Initialize, (client) => {
-      setClient(client);
-      unsubscribe();
-    });
+    const unsubscribes = [
+      addHandler(ServerPacketType.Initialize, (client) => {
+        setClient(client);
+
+        const code = getAndDeleteCookie("code");
+        if (code) send(ClientPacketType.JoinGame, { code });
+        else unsubscribes.forEach((u) => u());
+      }),
+      addHandler(ServerPacketType.InvalidCode, () => {
+        alert("Invalid code");
+        unsubscribes.forEach((u) => u());
+      }),
+      addHandler(
+        ServerPacketType.GameJoined,
+        ({ metadata, players, playerData }) => {
+          setMetadata(metadata);
+          fillPlayers(players);
+          client.playerData = playerData;
+          setClient(client);
+          close();
+        }
+      ),
+    ];
 
     send(ClientPacketType.Ready);
 
-    return () => unsubscribe();
+    return () => unsubscribes.forEach((u) => u());
   }, []);
 
   if (!client) return <Loading />;

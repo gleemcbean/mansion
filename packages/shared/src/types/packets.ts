@@ -33,6 +33,7 @@ export enum ServerPacketType {
   RTCSignalAnswer = "rtc-signal-answer",
   RTCSignalCandidate = "rtc-signal-candidate",
   Error = "error",
+  InvalidCode = "invalid-code",
 }
 
 export type PacketType = ClientPacketType | ServerPacketType;
@@ -76,6 +77,7 @@ export type ServerPacketMap = {
   [ServerPacketType.RTCSignalAnswer]: { from: UUID; sdp: string };
   [ServerPacketType.RTCSignalCandidate]: { from: UUID; candidate: RTCIceCandidateInit };
   [ServerPacketType.Error]: { message: string };
+  [ServerPacketType.InvalidCode]: {};
 };
 
 export type PacketMap = ClientPacketMap | ServerPacketMap;

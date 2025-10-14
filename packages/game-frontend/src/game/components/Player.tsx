@@ -6,7 +6,7 @@ import {
   RapierRigidBody,
   RigidBody,
 } from "@react-three/rapier";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Quat, Vec3 } from "@mansion/shared/types/util";
 import {
@@ -36,9 +36,13 @@ export default function Player({ playerData, username }: PlayerProps) {
   const character = useMemo(() => SkeletonUtils.clone(scene), [scene]);
   const bodyYaw = useRef(0);
 
+  const [height, setHeight] = useState(PL_HEIGHT);
+
   const velocityRef = useRef(new THREE.Vector3());
   const targetPosition = useRef(new THREE.Vector3(...gameData.position));
   const currentPosition = useRef(new THREE.Vector3(...gameData.position));
+  const targetScale = useRef(new THREE.Vector3(1, 1, 1));
+  const targetHeight = useRef(PL_HEIGHT);
 
   const targetQuaternion = useRef(new THREE.Quaternion(...gameData.quaternion));
   const currentQuaternion = useRef(
@@ -48,11 +52,6 @@ export default function Player({ playerData, username }: PlayerProps) {
   const bodyRef = useRef<RapierRigidBody>(null);
   const nameTagRef = useRef<THREE.Object3D>(null);
   const capLightRef = useRef<THREE.PointLight>(null);
-
-  const height = useMemo(
-    () => (playerData.gameData?.crouched ? PL_CROUCH_HEIGHT : PL_HEIGHT),
-    [playerData.gameData?.crouched]
-  );
 
   const getMaterialByName = (
     scene: THREE.Object3D,
@@ -80,6 +79,16 @@ export default function Player({ playerData, username }: PlayerProps) {
   }, [gameData.position, gameData.quaternion]);
 
   useEffect(() => {
+    if (playerData.gameData?.crouched) {
+      targetScale.current.set(0.4, 0.4, 0.4);
+      targetHeight.current = PL_CROUCH_HEIGHT;
+    } else {
+      targetScale.current.set(1, 1, 1);
+      targetHeight.current = PL_HEIGHT;
+    }
+  }, [playerData.gameData?.crouched]);
+
+  useEffect(() => {
     const cap = getMaterialByName(character, "Cap")!;
     cap.color.set(playerData.mushroomCapColor);
 
@@ -93,6 +102,15 @@ export default function Player({ playerData, username }: PlayerProps) {
   useFrame(({ camera, clock }, delta) => {
     currentPosition.current.lerp(targetPosition.current, 0.1);
     currentQuaternion.current.slerp(targetQuaternion.current, 0.1);
+
+    character.scale.x +=
+      (targetScale.current.x - character.scale.x) * delta * 10;
+    character.scale.y +=
+      (targetScale.current.y - character.scale.y) * delta * 10;
+    character.scale.z +=
+      (targetScale.current.z - character.scale.z) * delta * 10;
+
+    setHeight((prev) => prev + (targetHeight.current - prev) * delta * 10);
 
     velocityRef.current
       .copy(targetPosition.current)
@@ -176,7 +194,7 @@ export default function Player({ playerData, username }: PlayerProps) {
     <RigidBody type="kinematicPosition" colliders={false} ref={bodyRef}>
       {options.hud && (
         <Text
-          position={[0, PL_HEIGHT / 2 + PL_THICKNESS + 0.2, 0]}
+          position={[0, height / 2 + PL_THICKNESS + 0.2, 0]}
           fontSize={0.12}
           fontWeight={800}
           color="white"
@@ -188,7 +206,7 @@ export default function Player({ playerData, username }: PlayerProps) {
         </Text>
       )}
       <group
-        position={[0, -PL_HEIGHT / 2 - PL_THICKNESS, 0]}
+        position={[0, -height / 2 - PL_THICKNESS, 0]}
         rotation={[0, Math.PI, 0]}
       >
         <primitive object={character} />

@@ -43,4 +43,7 @@ export default defineConfig({
       },
     ],
   },
+  server: {
+    allowedHosts: ["tunnel.gche.me"],
+  },
 });

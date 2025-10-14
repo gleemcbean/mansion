@@ -15,6 +15,9 @@
     "@react-three/fiber": "^9.3.0",
     "@react-three/postprocessing": "^3.0.4",
     "@react-three/rapier": "^2.1.0",
+    "@types/express": "^5.0.3",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
     "jotai": "^2.14.0",
     "postprocessing": "^6.37.8",
     "react": "^19.1.1",
@@ -29,6 +32,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@types/ejs": "^3.1.5",
     "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
@@ -42,7 +46,7 @@
     "sass": "^1.93.0",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.44.1",
-    "vite": "^7.1.7",
+    "vite": "^7.1.10",
     "vite-plugin-glsl": "^1.5.4"
   }
 }

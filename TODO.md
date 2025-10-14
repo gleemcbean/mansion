@@ -1,3 +1,1 @@
-- [ ] Options scroll
 - [ ] Crouch animation
-- [ ]
