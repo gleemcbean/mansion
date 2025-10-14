@@ -5,17 +5,18 @@ import {
 } from "@/constants/Options";
 import Container from "../components/Container";
 import styles from "../styles/modules/pages/Options.module.scss";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import BooleanOption from "../components/BooleanOption";
 import useClient from "@/hooks/useClient";
 import SliderOption from "../components/SliderOption";
 import KeyOption from "../components/KeyOption";
 
 type HoverShape = {
-  top: string;
-  left: string;
-  width: string;
-  height: string;
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  element: EventTarget;
 } | null;
 
 export type ComponentProps = {
@@ -29,30 +30,69 @@ type OptionsProps = {
 };
 
 const HOVER_SHAPE_PADDING = 8;
+const SCROLL_STEP = 150;
+const SCROLL_DURATION = 200;
 
 export default function Options({ back }: OptionsProps) {
   const { options, setOption } = useClient();
   const [selected, setSelected] = useState(0);
   const [hoverShape, setHoverShape] = useState<HoverShape>(null);
+  const [scroll, setScroll] = useState(0);
+  const hoverable = useRef(true);
+  const timeout = useRef<NodeJS.Timeout>(null);
+  const scrollerRef = useRef<HTMLUListElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const hover = useCallback((e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    if (!hoverable.current) return;
     const bounds = e.currentTarget.getBoundingClientRect();
 
     setHoverShape({
-      top: `${bounds.top - HOVER_SHAPE_PADDING}px`,
-      left: `${bounds.left - HOVER_SHAPE_PADDING}px`,
-      width: `${bounds.width + HOVER_SHAPE_PADDING * 2}px`,
-      height: `${bounds.height + HOVER_SHAPE_PADDING * 2}px`,
+      top: bounds.top - HOVER_SHAPE_PADDING,
+      left: bounds.left - HOVER_SHAPE_PADDING,
+      width: bounds.width + HOVER_SHAPE_PADDING * 2,
+      height: bounds.height + HOVER_SHAPE_PADDING * 2,
+      element: e.target,
     });
   }, []);
 
-  useEffect(() => {
-    return () => setHoverShape(null);
-  }, []);
+  const scrollContainer = (e: React.WheelEvent<HTMLElement>) => {
+    if (!sidebarRef.current || !scrollerRef.current) return;
+
+    if (timeout.current) clearTimeout(timeout.current);
+    hoverable.current = false;
+
+    const sidebarHeight = sidebarRef.current.getBoundingClientRect().height;
+    const scrollHeight = scrollerRef.current.getBoundingClientRect().height;
+
+    const oldScroll = scroll;
+    let newScroll = scroll - SCROLL_STEP * Math.sign(e.deltaY);
+    newScroll = Math.max(newScroll, sidebarHeight - scrollHeight);
+    newScroll = Math.min(0, newScroll);
+    const step = oldScroll - newScroll;
+
+    setScroll(newScroll);
+
+    setHoverShape((prev) => {
+      if (
+        prev?.element &&
+        scrollerRef.current!.contains(prev.element as HTMLElement)
+      ) {
+        return { ...prev!, top: prev!.top - step };
+      }
+
+      return prev;
+    });
+
+    timeout.current = setTimeout(
+      () => (hoverable.current = true),
+      SCROLL_DURATION
+    );
+  };
 
   return (
-    <Container horizontal>
-      <div className={styles.sidebar}>
+    <Container horizontal onWheel={scrollContainer}>
+      <div className={styles.sidebar} ref={sidebarRef}>
         <h1 className={styles.title}>Options</h1>
         <ul className={styles.categories}>
           <span
@@ -65,7 +105,10 @@ export default function Options({ back }: OptionsProps) {
               className={`${styles.category}${
                 index === selected ? ` ${styles.selected}` : ""
               }`}
-              onClick={() => setSelected(index)}
+              onClick={() => {
+                setSelected(index);
+                setScroll(0);
+              }}
               onMouseEnter={hover}
             >
               {category}
@@ -76,7 +119,14 @@ export default function Options({ back }: OptionsProps) {
           </li>
         </ul>
       </div>
-      <ul className={styles.options}>
+      <ul
+        className={styles.options}
+        style={{
+          transform: `translateY(${scroll}px)`,
+          transition: `${SCROLL_DURATION}ms ease`,
+        }}
+        ref={scrollerRef}
+      >
         {OPTIONS_COMPONENTS[Object.values(OptionCategory)[selected]].map(
           (component, index) => {
             if (component.separator) {
