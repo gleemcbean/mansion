@@ -236,7 +236,13 @@ export default function Lobby({ back }: LobbyProps) {
 
   const copyCode = () => {
     if (!opened) return;
-    navigator.clipboard.writeText(metadata!.code);
+    const url = new URL(window.location.href);
+    url.pathname = `/${metadata!.code}`;
+
+    navigator.clipboard.writeText(
+      `Game code: ${metadata!.code}\n${url.toString()}`
+    );
+
     setCopied(true);
     setTimeout(() => setCopied(false), 2_000);
   };

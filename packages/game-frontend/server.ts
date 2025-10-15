@@ -58,4 +58,4 @@ app.get("/:code", async (req, res) => {
 const server = await app.listen(process.env.PORT);
 const address = server.address() as AddressInfo;
 
-console.log(`Server running on http://localhost:${address.port}`);
+console.log(`Server running on https://${address.port}.gche.me`);

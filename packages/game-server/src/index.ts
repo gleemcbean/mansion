@@ -11,4 +11,4 @@ const server = Bun.serve({
   },
 });
 
-console.log(`Server started on ${server.url}`);
+console.log(`Server started on https://${server.port}.gche.me`);
