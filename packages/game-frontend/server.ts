@@ -36,11 +36,23 @@ app.get("/", async (req, res, next) => {
 });
 
 app.get("/:code", async (req, res) => {
-  console.log(!!req.get("Cookie"));
+  const code = req.params.code.toUpperCase();
+  if (!/^[A-Z0-9]{6}$/.test(code)) return res.redirect("/");
 
-  const code = req.params.code;
-  if (!/^[a-zA-Z0-9]{6}$/.test(code)) return res.redirect("/");
-  return res.cookie("code", code.toUpperCase()).redirect("/");
+  const isBot =
+    /bot|crawl|spider|facebookexternalhit|twitterbot|discordbot/i.test(
+      req.get("User-Agent") || ""
+    );
+
+  if (isBot) {
+    const templatePath = path.resolve(__dirname, "index.ejs");
+    return res.render(templatePath, {
+      ...config,
+      title: config.title + " - Join room " + code,
+    });
+  }
+
+  return res.cookie("code", code).redirect("/");
 });
 
 const server = await app.listen(process.env.PORT);

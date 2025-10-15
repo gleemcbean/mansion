@@ -1,16 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <title><%= title %></title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <title><%= title %></title>
-    <meta name="og:title" content="<%= title %>" />
     <meta name="description" content="<%= description %>" />
+    <meta name="author" content="<%= author %>" />
+    <meta name="keywords" content="<%= keywords.join(", ") %>" />
     <meta name="theme-color" content="<%= themeColor %>" />
+    <meta name="revisit-after" content="<%= revisitDays %> days" />
+    <meta name="og:title" content="<%= title %>" />
     <meta name="og:site_name" content="<%= title %>" />
+    <meta property="og:url" content="<%= canonicalURL %>" />
     <meta name="og:description" content="<%= description %>" />
-    <link type="application/json+oembed" href="<%= oEmbedURL %>" />
+    <meta name="og:image" content="<%= canonicalURL %><%= icon %>" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:title" content="<%= title %>" />
+    <meta name="twitter:description" content="<%= description %>" />
+    <meta name="twitter:image" content="<%= canonicalURL %><%= icon %>" />
+    <meta name="twitter:creator" content="@<%= twitterUsername %>" />
+    <meta name="apple-mobile-web-app-capable" content="no" />
+    <link rel="canonical" href="<%= canonicalURL %>" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link rel="icon" href="/images/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" href="/images/favicon-192x192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="<%= canonicalURL %><%= icon %>" />
+    <link
+      type="application/json+oembed"
+      href="<%= canonicalURL %><%= oEmbedURL %>"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "url": "<%= canonicalURL %>",
+        "name": "<%= title %>",
+        "author": {
+          "@type": "Person",
+          "name": "<%= author %>"
+        },
+        "description": "<%= description %>",
+        "publisher": {
+          "@type": "Organization",
+          "name": "<%= title %>",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "<%= canonicalURL %><%= icon %>"
+          }
+        },
+        "operatingSystem": "Web",
+        "applicationCategory": "Game",
+        "genre": "<%= genre %>",
+        "playMode": "MultiPlayer",
+        "inLanguage": "en-US"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

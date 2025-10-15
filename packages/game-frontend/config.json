@@ -1,6 +1,22 @@
 {
   "title": "Mansion",
-  "description": "Run for your life and capture anomalies to survive this haunted mansion.",
+  "description": "Run for your life and capture anomalies to survive this haunted mansion.\n\nBe the one that captures the most anomalies to win!",
+  "author": "Glee McBean",
+  "twitterUsername": "GleeMcBean",
+  "keywords": [
+    "Game",
+    "Three.js",
+    "Mansion",
+    "Mushroom",
+    "3d",
+    "Horror",
+    "Fun",
+    "Friends"
+  ],
+  "genre": "Horror",
   "themeColor": "#694969",
-  "oEmbedURL": "https://tunnel.gche.me/oEmbed.json"
+  "revisitDays": 7,
+  "canonicalURL": "https://tunnel.gche.me",
+  "icon": "/images/favicon-256x256.png",
+  "oEmbedURL": "/oEmbed.json"
 }
