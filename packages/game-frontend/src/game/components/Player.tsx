@@ -1,16 +1,17 @@
 import type { Client } from "@mansion/shared/types/player";
-import { Sparkles, Text, useGLTF } from "@react-three/drei";
+import { Text, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   CapsuleCollider,
   RapierRigidBody,
   RigidBody,
 } from "@react-three/rapier";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Quat, Vec3 } from "@mansion/shared/types/util";
 import {
   PL_CROUCH_HEIGHT,
+  PL_CROUCH_THICKNESS,
   PL_HEIGHT,
   PL_PROXIMITY_CHAT_DISTANCE,
   PL_THICKNESS,
@@ -37,12 +38,14 @@ export default function Player({ playerData, username }: PlayerProps) {
   const bodyYaw = useRef(0);
 
   const [height, setHeight] = useState(PL_HEIGHT);
+  const [thickness, setThickness] = useState(PL_THICKNESS);
 
   const velocityRef = useRef(new THREE.Vector3());
   const targetPosition = useRef(new THREE.Vector3(...gameData.position));
   const currentPosition = useRef(new THREE.Vector3(...gameData.position));
   const targetScale = useRef(new THREE.Vector3(1, 1, 1));
   const targetHeight = useRef(PL_HEIGHT);
+  const targetThickness = useRef(PL_THICKNESS);
 
   const targetQuaternion = useRef(new THREE.Quaternion(...gameData.quaternion));
   const currentQuaternion = useRef(
@@ -82,9 +85,11 @@ export default function Player({ playerData, username }: PlayerProps) {
     if (playerData.gameData?.crouched) {
       targetScale.current.set(0.4, 0.4, 0.4);
       targetHeight.current = PL_CROUCH_HEIGHT;
+      targetThickness.current = PL_CROUCH_THICKNESS;
     } else {
       targetScale.current.set(1, 1, 1);
       targetHeight.current = PL_HEIGHT;
+      targetThickness.current = PL_THICKNESS;
     }
   }, [playerData.gameData?.crouched]);
 
@@ -111,6 +116,9 @@ export default function Player({ playerData, username }: PlayerProps) {
       (targetScale.current.z - character.scale.z) * delta * 10;
 
     setHeight((prev) => prev + (targetHeight.current - prev) * delta * 10);
+    setThickness(
+      (prev) => prev + (targetThickness.current - prev) * delta * 10
+    );
 
     velocityRef.current
       .copy(targetPosition.current)
@@ -192,9 +200,9 @@ export default function Player({ playerData, username }: PlayerProps) {
 
   return (
     <RigidBody type="kinematicPosition" colliders={false} ref={bodyRef}>
-      {options.hud && (
+      {options.hud && !playerData.gameData?.crouched && (
         <Text
-          position={[0, height / 2 + PL_THICKNESS + 0.2, 0]}
+          position={[0, height / 2 + thickness + 0.2, 0]}
           fontSize={0.12}
           fontWeight={800}
           color="white"
@@ -210,25 +218,8 @@ export default function Player({ playerData, username }: PlayerProps) {
         rotation={[0, Math.PI, 0]}
       >
         <primitive object={character} />
-        {playerData.gameData!.lighting && (
-          <React.Fragment>
-            <pointLight
-              intensity={2}
-              distance={10}
-              color={playerData.mushroomCapColor}
-              ref={capLightRef}
-            />
-            <Sparkles
-              count={100}
-              speed={0.4}
-              color="white"
-              size={1}
-              scale={3}
-            />
-          </React.Fragment>
-        )}
       </group>
-      <CapsuleCollider args={[height / 2, PL_THICKNESS]} friction={0} />
+      <CapsuleCollider args={[height / 2, thickness]} friction={0} />
       {options.showHelper && (
         <mesh>
           <sphereGeometry args={[PL_PROXIMITY_CHAT_DISTANCE, 8, 8]} />

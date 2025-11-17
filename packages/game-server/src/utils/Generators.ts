@@ -124,7 +124,7 @@ export default class Generators {
     };
 
     return populate(
-      new PositionedRoom(randomRoom(available.filter((r) => !r.deadend)))
+      new PositionedRoom(available.find((r) => r.id === "corridor")!)
     );
   }
 }

@@ -1,7 +1,8 @@
 // DIMENSIONS
 export const PL_HEIGHT = 1.2;
-export const PL_CROUCH_HEIGHT = 0;
+export const PL_CROUCH_HEIGHT = 0.5;
 export const PL_THICKNESS = 0.2;
+export const PL_CROUCH_THICKNESS = 0.05;
 export const PL_EYE_DISTANCE = 0.1;
 
 // SPEEDS

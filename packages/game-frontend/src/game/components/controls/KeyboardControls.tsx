@@ -25,6 +25,7 @@ import {
   PL_THICKNESS,
   PL_EYE_DISTANCE,
   PL_CROUCH_HEIGHT,
+  PL_CROUCH_THICKNESS,
 } from "@mansion/shared/constants/player";
 import useClient from "@/hooks/useClient";
 import useWebsocket from "@/hooks/useWebsocket";
@@ -43,7 +44,10 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const body = useRef<RapierRigidBody>(null);
   const [lighting, setLighting] = useState({ value: false, ready: true });
   const [height, setHeight] = useState(PL_HEIGHT);
+  const [thickness, setThickness] = useState(PL_THICKNESS);
   const targetHeight = useRef(PL_HEIGHT);
+  const targetThickness = useRef(PL_THICKNESS);
+
   const lastSent = useRef(0);
   const lastEnergyDrain = useRef(0);
   const energy = useRef(100);
@@ -54,6 +58,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const jRaycaster = useRef(new THREE.Raycaster());
   const cRaycaster = useRef(new THREE.Raycaster());
   const canJump = useRef(true);
+
   const { 1: get } = useKeyboardControls();
   const { camera } = useThree();
   const { options, room, setRoom, setGameData } = useClient();
@@ -81,9 +86,8 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   useEffect(() => {
     jRaycaster.current.far =
       targetHeight.current / 2 + PL_THICKNESS + PL_EYE_DISTANCE + 0.05;
-
     cRaycaster.current.far =
-      PL_HEIGHT / 2 + PL_THICKNESS - PL_EYE_DISTANCE + 0.05;
+      targetHeight.current / 2 + PL_THICKNESS - PL_EYE_DISTANCE + 0.05;
 
     jRaycaster.current.near = cRaycaster.current.near = 0;
 
@@ -165,8 +169,10 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 
     if (crouch || (!crouch && !canDecrouch)) {
       targetHeight.current = PL_CROUCH_HEIGHT;
+      targetThickness.current = PL_CROUCH_THICKNESS;
     } else {
       targetHeight.current = PL_HEIGHT;
+      targetThickness.current = PL_THICKNESS;
     }
 
     const crouched = targetHeight.current === PL_CROUCH_HEIGHT;
@@ -225,6 +231,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
     }
 
     setHeight((prev) => prev + (targetHeight.current - prev) * delta * 5);
+    setThickness((prev) => prev + (targetThickness.current - prev) * delta * 5);
 
     const t = body.current.translation();
     const q = camera.quaternion.clone();
@@ -275,7 +282,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
       angularDamping={1}
       friction={0}
     >
-      {!options.noClip && <CapsuleCollider args={[height / 2, PL_THICKNESS]} />}
+      {!options.noClip && <CapsuleCollider args={[height / 2, thickness]} />}
       <pointLight
         position={[0, height / 2, 0]}
         intensity={6}
