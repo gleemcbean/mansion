@@ -1,24 +1,25 @@
-import EventHandler from "@/EventHandler";
-import { Lobby } from "@/services/lobby";
 import {
-  ClientPacketType,
-  ServerPacketType,
+	ClientPacketType,
+	ServerPacketType,
 } from "@mansion/shared/types/packets";
 import Packet from "@mansion/shared/utils/Packet";
+import EventHandler from "@/EventHandler";
+import { Lobby } from "@/services/lobby";
+import type { WSClient } from "../types";
 
 export default new EventHandler(ClientPacketType.HostGame, (ws) => {
-  const lobby = new Lobby({
-    uuid: ws.data.uuid,
-    username: ws.data.username!,
-    ws,
-  });
+	const lobby = new Lobby({
+		uuid: ws.data.uuid,
+		username: ws.data.username as string,
+		ws,
+	});
 
-  const me = lobby.getPlayer(ws.data.uuid)!;
+	const me = lobby.getPlayer(ws.data.uuid) as WSClient;
 
-  ws.send(
-    Packet.create(ServerPacketType.GameHosted, {
-      ...lobby.toJSON(),
-      playerData: me.playerData,
-    })
-  );
+	ws.send(
+		Packet.create(ServerPacketType.GameHosted, {
+			...lobby.toJSON(),
+			playerData: me.playerData,
+		}),
+	);
 });

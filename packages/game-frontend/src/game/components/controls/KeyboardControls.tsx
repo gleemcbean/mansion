@@ -39,6 +39,7 @@ type KeyboardControlsProps = {
 };
 
 const JUMP_TIMEOUT = 500;
+const PL_VOLUME = Math.PI * PL_THICKNESS ** 2 * PL_HEIGHT;
 
 function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const body = useRef<RapierRigidBody>(null);
@@ -57,7 +58,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
   const oldPos = useRef(new THREE.Vector3());
   const jRaycaster = useRef(new THREE.Raycaster());
   const cRaycaster = useRef(new THREE.Raycaster());
-  const canJump = useRef(true);
+  const currentPlayerVolume = useRef(PL_VOLUME);
 
   const { 1: get } = useKeyboardControls();
   const { camera } = useThree();
@@ -220,14 +221,17 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
     hits = jRaycaster.current.intersectObjects(candidates, true);
     const grounded = !!hits[0];
 
-    if (canJump.current && jump && grounded && yVel < 0.001) {
+    if (jump && grounded && yVel < 0.25) {
+      currentPlayerVolume.current =
+        Math.PI * thickness ** 2 * height;
+
+      const ratio = currentPlayerVolume.current / PL_VOLUME;
+
       body.current.applyImpulse(
-        { x: direction.x, y: PL_JUMP_FORCE, z: direction.z },
+        { x: direction.x, y: PL_JUMP_FORCE * ratio, z: direction.z },
         true
       );
 
-      canJump.current = false;
-      setTimeout(() => (canJump.current = true), JUMP_TIMEOUT);
     }
 
     setHeight((prev) => prev + (targetHeight.current - prev) * delta * 5);

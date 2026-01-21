@@ -3,7 +3,7 @@ import useWebsocket from "@/hooks/useWebsocket";
 import { ServerPacketType } from "@mansion/shared/types/packets";
 import type { Client } from "@mansion/shared/types/player";
 import React, { useEffect, useState } from "react";
-import Player from "../Player";
+import Player from "../entities/Player";
 import useClient from "@/hooks/useClient";
 
 export default function PlayerManager() {
