@@ -32,5 +32,8 @@ export default function Tentacles({ data }: TentaclesProps) {
 	// 	</RigidBody>
 	// );
 
-	return null;
+	return <mesh position={data.position} rotation={data.rotation}>
+		<boxGeometry attach="geometry" args={[1, 1, 1]} />
+		<meshStandardMaterial attach="material" color="#e06b6b" />
+	</mesh>;
 }

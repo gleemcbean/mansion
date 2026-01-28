@@ -5,69 +5,8 @@ from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 from collections import deque
 import time
 import random
-
-SAMPLE_RATE = 16000
-CHUNK_DURATION = 0.1
-BUFFER_DURATION = 2.0
-CHUNK_SIZE = int(SAMPLE_RATE * CHUNK_DURATION)
-BUFFER_SIZE = int(SAMPLE_RATE * BUFFER_DURATION)
-
-PATTERNS = [
-  {
-    "name": "ABA",
-    "patterns": ["ABBA", "ABA", "ABAH", "ABAA"],
-    "fuzzy_match": True
-  },
-  {
-    "name": "LABI",
-    "patterns": ["LABI", "LEBI", "LABIT", "LEVI", "LEVIT", "LEDY", "LEDI", "LABBY", "LABEY"],
-    "fuzzy_match": True
-  },
-  {
-    "name": "LIS",
-    "patterns": ["LIS", "LISSE", "LISS", "LEASE", "LEESE"],
-    "fuzzy_match": True
-  },
-  {
-    "name": "EKO",
-    "patterns": ["EKO", "ECHO", "ECO", "EKKO", "ECKO"],
-    "fuzzy_match": True
-  },
-  {
-    "name": "DIS",
-    "patterns": ["DIS", "DISS", "DICE", "DISE", "THIS"],
-    "fuzzy_match": True
-  },
-  {
-    "name": "CI",
-    "patterns": ["CI", "SEE", "SI", "SHE", "CEE", "SEA"],
-    "fuzzy_match": True
-  },
-  {
-    "name": "KA",
-    "patterns": ["KA", "CAR", "CAH", "KAH", "CUH"],
-    "fuzzy_match": True
-  },
-  {
-    "name": "BOO",
-    "patterns": ["BOO", "BOOH", "BU", "BOH", "BOW"],
-    "fuzzy_match": True
-  },
-  {
-    "name": "OUM",
-    "patterns": ["OUM", "OM", "OHM", "UMM", "OME", "OHM"],
-    "fuzzy_match": True
-  },
-  {
-    "name": "GEN",
-    "patterns": ["GEN", "JEN", "GENE", "JEAN", "JIN"],
-    "fuzzy_match": True
-  }
-]
-
-RESET_TIMEOUT = 10.0 
-CONFIDENCE_THRESHOLD = 0.6
-TARGET_PATTERN_SIZE = 3
+from config import *
+from constants.patterns import PATTERNS
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {device}")
