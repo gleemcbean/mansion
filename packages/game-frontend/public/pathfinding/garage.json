@@ -1,0 +1,75 @@
+{
+	"gridSize": 0.35,
+	"width": 12,
+	"depth": 18,
+	"groundLevel": 0.5,
+	"bounds": {
+		"minX": 0,
+		"maxX": 4,
+		"minZ": 0,
+		"maxZ": 6
+	},
+	"character": {
+		"height": 1.2,
+		"radius": 0.35
+	},
+	"grid": [
+		[
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			false
+		],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[false, true, true, true, true, true, true, true, true, true, false, false],
+		[
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			true,
+			false,
+			false,
+			false,
+			false
+		],
+		[
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+			true,
+			true,
+			false,
+			false,
+			false,
+			false
+		]
+	]
+}

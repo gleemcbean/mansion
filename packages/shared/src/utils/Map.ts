@@ -178,8 +178,12 @@ export class Room {
 		return Math.abs(area) / 2;
 	}
 
-	public get filename(): string {
+	public get modelFilename(): string {
 		return `${this.id}.glb`;
+	}
+
+	public get pathfindingFilename(): string {
+		return `${this.id}.json`;
 	}
 
 	public get deadend(): boolean {
@@ -190,6 +194,7 @@ export class Room {
 export class PositionedRoom extends Room {
 	public position: Vec2;
 	public direction: CardinalDirection;
+	public anomalies: string[] = [];
 
 	public static translateFromDirection(
 		direction: CardinalDirection,

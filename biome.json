@@ -17,7 +17,14 @@
 		"rules": {
 			"recommended": true,
 			"complexity": {
-				"noStaticOnlyClass": "off"
+				"noStaticOnlyClass": "off",
+				"noBannedTypes": "off"
+			},
+			"correctness": {
+				"useExhaustiveDependencies": "off"
+			},
+			"style": {
+				"noNonNullAssertion": "off"
 			}
 		}
 	},

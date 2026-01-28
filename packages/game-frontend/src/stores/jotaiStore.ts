@@ -1,19 +1,21 @@
+import type { LobbyMetadata } from "@mansion/shared/types/lobby";
+import type {
+	ServerPacketMap,
+	ServerPacketType,
+} from "@mansion/shared/types/packets";
+import type { Client, PlayerGameData } from "@mansion/shared/types/player";
+import type { UUID } from "@mansion/shared/types/util";
+import type Anomaly from "@mansion/shared/utils/Anomaly";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { DEFAULT_OPTIONS } from "@/constants/Options";
-import type { PlayerGameData, Client } from "@mansion/shared/types/player";
-import type { UUID } from "@mansion/shared/types/util";
-import type {
-  ServerPacketMap,
-  ServerPacketType,
-} from "@mansion/shared/types/packets";
-import type { LobbyMetadata } from "@mansion/shared/types/lobby";
 
 export type PacketCallback = (d: ServerPacketMap[ServerPacketType]) => void;
 export type PacketSet = Set<PacketCallback>;
 
 export const lobbyMetadataAtom = atom<LobbyMetadata | null>(null);
 export const playersAtom = atom<Map<UUID, Client>>(new Map());
+export const anomaliesAtom = atom<Anomaly[]>([]);
 
 export const localStreamAtom = atom<MediaStream | null>(null);
 export const playerRTCsAtom = atom<Map<UUID, RTCPeerConnection>>(new Map());

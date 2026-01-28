@@ -15,26 +15,26 @@ $section-max-height: 700px;
 @mixin crt-overlay {
   $background: #000;
 
-  filter: blur(0.65px);
+  filter: blur(0.0px);
 
-  &::before {
-    content: "";
-    inset: 0;
-    position: fixed;
-    pointer-events: none;
-    background: linear-gradient(
-        rgba($background, 0) 50%,
-        rgba(color.adjust($background, $lightness: -10%), 0.35) 50%
-      ),
-      linear-gradient(
-        90deg,
-        rgba(red, 0.06),
-        rgba(green, 0.02),
-        rgba(blue, 0.06)
-      );
-    z-index: 999;
-    background-size: 100% 2px, 3px 100%;
-  }
+  // &::before {
+  //   content: "";
+  //   inset: 0;
+  //   position: fixed;
+  //   pointer-events: none;
+  //   background: linear-gradient(
+  //       rgba($background, 0) 50%,
+  //       rgba(color.adjust($background, $lightness: -10%), 0.35) 50%
+  //     ),
+  //     linear-gradient(
+  //       90deg,
+  //       rgba(red, 0.06),
+  //       rgba(green, 0.02),
+  //       rgba(blue, 0.06)
+  //     );
+  //   z-index: 999;
+  //   background-size: 100% 2px, 3px 100%;
+  // }
 }
 
 @keyframes slide-in-left {

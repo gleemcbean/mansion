@@ -37,7 +37,7 @@ export class Logger {
 		}
 
 		return `${color}${level.toUpperCase()}${reset} ${ctx}${message}${
-			meta ? " " + meta : ""
+			meta ? ` ${meta}` : ""
 		}`;
 	}
 

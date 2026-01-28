@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room Pathfinding Grid Generator</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+    
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 30px;
+    }
+    
+    .panel {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .panel h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    .upload-area {
+      border: 2px dashed #667eea;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: white;
+    }
+    
+    .upload-area:hover {
+      border-color: #764ba2;
+      background: #f8f9ff;
+    }
+    
+    .upload-area.dragover {
+      background: #e8ebff;
+      border-color: #764ba2;
+    }
+    
+    input[type="file"] {
+      display: none;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.2s;
+      margin: 5px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    #viewer {
+      width: 100%;
+      height: 400px;
+      background: #000;
+      border-radius: 8px;
+      position: relative;
+    }
+    
+    #gridCanvas {
+      width: 100%;
+      height: 400px;
+      border-radius: 8px;
+      background: white;
+      border: 1px solid #ddd;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .input-group label {
+      font-size: 14px;
+      color: #555;
+      white-space: nowrap;
+    }
+    
+    .input-group input {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 80px;
+    }
+    
+    .status {
+      margin-top: 15px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    .viewer-info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: monospace;
+    }
+    
+    textarea {
+      width: 100%;
+      height: 200px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎮 Room Pathfinding Grid Generator</h1>
+      <p class="subtitle">Character radius = Grid size | Obstacles detected from ground level | Only door-connected areas walkable</p>
+    </div>
+    
+    <div class="content">
+      <div class="panel">
+        <h2>📦 Model Upload</h2>
+        <div class="upload-area" id="uploadArea">
+          <p style="font-size: 48px; margin-bottom: 10px;">📁</p>
+          <p><strong>Drop your GLB file here</strong></p>
+          <p style="margin-top: 10px; font-size: 14px; color: #666;">or click to browse</p>
+          <input type="file" id="fileInput" accept=".glb,.gltf">
+        </div>
+        
+        <div class="controls">
+          <div class="input-group">
+            <label>Grid Size (= Character Diameter):</label>
+            <input type="number" id="gridSize" value="0.4" step="0.1" min="0.1">
+          </div>
+          <div class="input-group">
+            <label>Character Height:</label>
+            <input type="number" id="charHeight" value="1.2" step="0.1" min="0.1">
+          </div>
+          <div class="input-group">
+            <label>Ground Level (Y):</label>
+            <input type="number" id="groundLevel" value="0.5" step="0.1">
+          </div>
+        </div>
+        
+        <div class="controls">
+          <button class="btn" id="generateBtn" disabled>Generate Grid</button>
+          <button class="btn" id="downloadBtn" disabled>Download JSON</button>
+        </div>
+        
+        <div class="status" id="status">
+          Awaiting file upload...
+        </div>
+        
+        <div id="viewer">
+          <div class="viewer-info">
+            <div>Use mouse to rotate view</div>
+            <div>Scroll to zoom</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel">
+        <h2>🗺️ Navigation Grid</h2>
+        <canvas id="gridCanvas"></canvas>
+        
+        <div style="margin-top: 15px;">
+          <h3 style="font-size: 14px; margin-bottom: 10px;">Grid Data (JSON)</h3>
+          <textarea id="gridData" readonly placeholder="Grid data will appear here..."></textarea>
+        </div>
+        
+        <div style="margin-top: 15px; font-size: 12px; color: #666;">
+          <strong>Legend:</strong> 
+          <span style="display: inline-block; width: 20px; height: 20px; background: #4ade80; vertical-align: middle; margin: 0 5px;"></span> Walkable
+          <span style="display: inline-block; width: 20px; height: 20px; background: #ef4444; vertical-align: middle; margin: 0 5px;"></span> Obstacle
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const viewerElement = document.getElementById('viewer');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a1a1a);
+    
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      viewerElement.clientWidth / viewerElement.clientHeight,
+      0.1,
+      1000
+    );
+    
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(viewerElement.clientWidth, viewerElement.clientHeight);
+    viewerElement.appendChild(renderer.domElement);
+    
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 10, 5);
+    scene.add(directionalLight);
+    
+    const gridHelper = new THREE.GridHelper(20, 20);
+    scene.add(gridHelper);
+    
+    camera.position.set(5, 5, 5);
+    camera.lookAt(0, 0, 0);
+    
+    let loadedModel = null;
+    let modelBounds = null;
+    let navigationGrid = null;
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+    
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const status = document.getElementById('status');
+    const generateBtn = document.getElementById('generateBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    
+    uploadArea.addEventListener('click', () => fileInput.click());
+    
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        loadModel(files[0]);
+      }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        loadModel(e.target.files[0]);
+      }
+    });
+    
+    function loadModel(file) {
+      status.textContent = 'Loading model...';
+      generateBtn.disabled = true;
+      downloadBtn.disabled = true;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const loader = new GLTFLoader();
+        loader.parse(e.target.result, '', (gltf) => {
+          if (loadedModel) {
+            scene.remove(loadedModel);
+          }
+          
+          loadedModel = gltf.scene;
+          scene.add(loadedModel);
+          
+          const box = new THREE.Box3().setFromObject(loadedModel);
+          modelBounds = {
+            min: box.min,
+            max: box.max,
+            size: new THREE.Vector3()
+          };
+          box.getSize(modelBounds.size);
+          
+          const center = new THREE.Vector3();
+          box.getCenter(center);
+          
+          const maxDim = Math.max(modelBounds.size.x, modelBounds.size.y, modelBounds.size.z);
+          camera.position.set(
+            center.x + maxDim * 1.5,
+            center.y + maxDim * 1.5,
+            center.z + maxDim * 1.5
+          );
+          controls.target.copy(center);
+          controls.update();
+          
+          status.textContent = `Model loaded! Bounds: ${modelBounds.size.x.toFixed(2)} x ${modelBounds.size.y.toFixed(2)} x ${modelBounds.size.z.toFixed(2)}`;
+          generateBtn.disabled = false;
+        }, (error) => {
+          status.textContent = 'Error loading model: ' + error;
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    }
+    
+    generateBtn.addEventListener('click', generateNavigationGrid);
+    
+    function generateNavigationGrid() {
+      if (!loadedModel || !modelBounds) return;
+      
+      const gridSize = parseFloat(document.getElementById('gridSize').value);
+      const charHeight = parseFloat(document.getElementById('charHeight').value);
+      const groundLevel = parseFloat(document.getElementById('groundLevel').value);
+      const charRadius = gridSize;
+      
+      status.textContent = 'Generating navigation grid...';
+      
+      const gridWidth = Math.ceil(modelBounds.size.x / gridSize);
+      const gridDepth = Math.ceil(modelBounds.size.z / gridSize);
+      
+      const grid = Array(gridDepth).fill(null).map(() => Array(gridWidth).fill(true));
+      
+      const raycaster = new THREE.Raycaster();
+      raycaster.far = charRadius * 2;
+      
+      const sampleAngles = [0, Math.PI/4, Math.PI/2, 3*Math.PI/4, Math.PI, 5*Math.PI/4, 3*Math.PI/2, 7*Math.PI/4];
+      
+      for (let z = 0; z < gridDepth; z++) {
+        for (let x = 0; x < gridWidth; x++) {
+          const worldX = modelBounds.min.x + (x + 0.5) * gridSize;
+          const worldZ = modelBounds.min.z + (z + 0.5) * gridSize;
+          
+          let isWalkable = true;
+          const heightSamples = 8;
+
+          for (let h = 0; h <= heightSamples; h++) {
+            const checkY = groundLevel + (h / heightSamples) * charHeight;
+            
+            const centerOrigin = new THREE.Vector3(worldX, checkY, worldZ);
+            
+            const directions = [
+              new THREE.Vector3(1, 0, 0),
+              new THREE.Vector3(-1, 0, 0), 
+              new THREE.Vector3(0, 0, 1),  
+              new THREE.Vector3(0, 0, -1), 
+              new THREE.Vector3(0.707, 0, 0.707),  
+              new THREE.Vector3(-0.707, 0, 0.707),  
+              new THREE.Vector3(0.707, 0, -0.707), 
+              new THREE.Vector3(-0.707, 0, -0.707) 
+            ];
+            
+            for (const dir of directions) {
+              raycaster.set(centerOrigin, dir);
+              const intersects = raycaster.intersectObject(loadedModel, true);
+              
+              if (intersects.length > 0 && intersects[0].distance < charRadius) {
+                isWalkable = false;
+                break;
+              }
+            }
+            
+            if (!isWalkable) break;
+            
+            for (const angle of sampleAngles) {
+              const perimeterX = worldX + Math.cos(angle) * (charRadius * 0.8);
+              const perimeterZ = worldZ + Math.sin(angle) * (charRadius * 0.8);
+              const perimeterOrigin = new THREE.Vector3(perimeterX, checkY, perimeterZ);
+              
+              for (const dir of directions) {
+                raycaster.set(perimeterOrigin, dir);
+                const intersects = raycaster.intersectObject(loadedModel, true);
+                
+                if (intersects.length > 0 && intersects[0].distance < charRadius * 0.3) {
+                  isWalkable = false;
+                  break;
+                }
+              }
+              
+              if (!isWalkable) break;
+            }
+            
+            if (!isWalkable) break;
+          }
+          
+          grid[z][x] = isWalkable;
+        }
+      }
+      
+      status.textContent = 'Applying door connectivity check...';
+      applyDoorConnectivity(grid, gridWidth, gridDepth);
+      
+      navigationGrid = {
+        gridSize: gridSize,
+        width: gridWidth,
+        depth: gridDepth,
+        groundLevel: groundLevel,
+        bounds: {
+          minX: modelBounds.min.x,
+          maxX: modelBounds.max.x,
+          minZ: modelBounds.min.z,
+          maxZ: modelBounds.max.z
+        },
+        character: {
+          height: charHeight,
+          radius: charRadius
+        },
+        grid: grid
+      };
+      
+      drawGrid(grid);
+      document.getElementById('gridData').value = JSON.stringify(navigationGrid, null, 2);
+      
+      const walkableCount = grid.flat().filter(x => x).length;
+      const totalCount = grid.flat().length;
+      status.textContent = `Grid generated! ${gridWidth}x${gridDepth} cells (${walkableCount}/${totalCount} walkable, door-connected)`;
+      downloadBtn.disabled = false;
+    }
+    
+    function applyDoorConnectivity(grid, width, height) {
+      const connected = Array(height).fill(null).map(() => Array(width).fill(false));
+      const queue = [];
+      
+      for (let x = 0; x < width; x++) {
+        if (grid[0][x]) {
+          queue.push([x, 0]);
+          connected[0][x] = true;
+        }
+      }
+      
+      for (let x = 0; x < width; x++) {
+        if (grid[height-1][x]) {
+          queue.push([x, height-1]);
+          connected[height-1][x] = true;
+        }
+      }
+      
+      for (let z = 1; z < height - 1; z++) {
+        if (grid[z][0]) {
+          queue.push([0, z]);
+          connected[z][0] = true;
+        }
+      }
+      
+      for (let z = 1; z < height - 1; z++) {
+        if (grid[z][width-1]) {
+          queue.push([width-1, z]);
+          connected[z][width-1] = true;
+        }
+      }
+      
+      const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+      
+      while (queue.length > 0) {
+        const [x, z] = queue.shift();
+        
+        for (const [dx, dz] of directions) {
+          const nx = x + dx;
+          const nz = z + dz;
+          
+          if (nx >= 0 && nx < width && nz >= 0 && nz < height) {
+            if (grid[nz][nx] && !connected[nz][nx]) {
+              connected[nz][nx] = true;
+              queue.push([nx, nz]);
+            }
+          }
+        }
+      }
+      
+      for (let z = 0; z < height; z++) {
+        for (let x = 0; x < width; x++) {
+          if (grid[z][x] && !connected[z][x]) {
+            grid[z][x] = false; 
+          }
+        }
+      }
+    }
+    
+    function drawGrid(grid) {
+      const canvas = document.getElementById('gridCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      const gridDepth = grid.length;
+      const gridWidth = grid[0].length;
+      
+      const cellWidth = canvas.width / gridWidth;
+      const cellHeight = canvas.height / gridDepth;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      for (let z = 0; z < gridDepth; z++) {
+        for (let x = 0; x < gridWidth; x++) {
+          const isWalkable = grid[z][x];
+          ctx.fillStyle = isWalkable ? '#4ade80' : '#ef4444';
+          ctx.fillRect(x * cellWidth, z * cellHeight, cellWidth, cellHeight);
+          
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 0.5;
+          ctx.strokeRect(x * cellWidth, z * cellHeight, cellWidth, cellHeight);
+        }
+      }
+    }
+    
+    downloadBtn.addEventListener('click', () => {
+      if (!navigationGrid) return;
+      
+      const dataStr = JSON.stringify(navigationGrid, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'navigation-grid.json';
+      a.click();
+      
+      URL.revokeObjectURL(url);
+    });
+    
+    window.addEventListener('resize', () => {
+      camera.aspect = viewerElement.clientWidth / viewerElement.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(viewerElement.clientWidth, viewerElement.clientHeight);
+    });
+  </script>
+</body>
+</html>
