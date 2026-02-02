@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syllable Recognition Client</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .client-id {
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+      margin-bottom: 30px;
+      font-family: monospace;
+    }
+
+    .status {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse 2s infinite;
+    }
+
+    .status-indicator.disconnected {
+      background-color: #e74c3c;
+    }
+
+    .status-indicator.connecting {
+      background-color: #f39c12;
+    }
+
+    .status-indicator.connected {
+      background-color: #2ecc71;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      color: #555;
+      font-weight: 500;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #startButton {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    #startButton:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    #stopButton {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+    }
+
+    #stopButton:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+    }
+
+    .audio-visualizer {
+      height: 60px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .visualizer-bar {
+      width: 3px;
+      background: linear-gradient(to top, #667eea, #764ba2);
+      margin: 0 2px;
+      border-radius: 3px;
+      transition: height 0.1s ease;
+    }
+
+    .log {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .log-title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .log-entry {
+      padding: 8px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      background: white;
+      border-left: 3px solid #667eea;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(-10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .log-time {
+      color: #999;
+      font-size: 11px;
+      margin-right: 10px;
+    }
+
+    .log-message {
+      color: #555;
+    }
+
+    .syllables-detected {
+      background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .syllables-count {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .syllables-label {
+      font-size: 14px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .info-box strong {
+      color: #2196f3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎤 Syllable Recognition</h1>
+    <div class="client-id" id="clientId">Client ID: Not connected</div>
+
+    <div class="syllables-detected">
+      <div class="syllables-count" id="syllableCount">0</div>
+      <div class="syllables-label">Syllables Detected</div>
+    </div>
+
+    <div class="status">
+      <span class="status-indicator disconnected" id="statusIndicator"></span>
+      <span class="status-text" id="statusText">Disconnected</span>
+    </div>
+
+    <div class="info-box">
+      <strong>Instructions:</strong> Click "Start" to begin. Speak any of the target syllables (ABA, LABI, LIS) and they will be detected and sent to the server.
+    </div>
+
+    <div class="audio-visualizer" id="visualizer">
+      <!-- Visualizer bars will be added dynamically -->
+    </div>
+
+    <div class="controls">
+      <button id="startButton">Start Recognition</button>
+      <button id="stopButton" disabled>Stop Recognition</button>
+    </div>
+
+    <div class="log">
+      <div class="log-title">Activity Log</div>
+      <div id="logEntries"></div>
+    </div>
+  </div>
+
+  <script>
+    let pc = null;
+    let localStream = null;
+    let clientId = null;
+    let syllableCount = 0;
+    let audioContext = null;
+    let analyser = null;
+    const visualizerBars = [];
+
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    const logEntries = document.getElementById('logEntries');
+    const clientIdElement = document.getElementById('clientId');
+    const syllableCountElement = document.getElementById('syllableCount');
+    const visualizer = document.getElementById('visualizer');
+
+    // Create visualizer bars
+    for (let i = 0; i < 30; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'visualizer-bar';
+      bar.style.height = '5px';
+      visualizer.appendChild(bar);
+      visualizerBars.push(bar);
+    }
+
+    function updateStatus(status, text) {
+      statusIndicator.className = `status-indicator ${status}`;
+      statusText.textContent = text;
+    }
+
+    function addLog(message) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      
+      const time = new Date().toLocaleTimeString();
+      entry.innerHTML = `
+        <span class="log-time">${time}</span>
+        <span class="log-message">${message}</span>
+      `;
+      
+      logEntries.insertBefore(entry, logEntries.firstChild);
+      
+      // Keep only last 10 entries
+      while (logEntries.children.length > 10) {
+        logEntries.removeChild(logEntries.lastChild);
+      }
+    }
+
+    function updateVisualizer() {
+      if (!analyser) return;
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteFrequencyData(dataArray);
+
+      // Update each bar based on frequency data
+      const barCount = visualizerBars.length;
+      const step = Math.floor(bufferLength / barCount);
+
+      for (let i = 0; i < barCount; i++) {
+        const index = i * step;
+        const value = dataArray[index];
+        const height = (value / 255) * 50 + 5; // 5-55px
+        visualizerBars[i].style.height = `${height}px`;
+      }
+
+      requestAnimationFrame(updateVisualizer);
+    }
+
+    async function startRecognition() {
+      try {
+        addLog('Requesting microphone access...');
+        
+        // Get user media
+        localStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            sampleRate: 16000
+          },
+          video: false
+        });
+
+        addLog('Microphone access granted');
+
+        // Setup audio visualizer
+        audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(localStream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        updateVisualizer();
+
+        // Create peer connection
+        pc = new RTCPeerConnection({
+          iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+
+        // Add audio track
+        localStream.getTracks().forEach(track => {
+          pc.addTrack(track, localStream);
+          addLog(`Added ${track.kind} track`);
+        });
+
+        // Handle connection state
+        pc.onconnectionstatechange = () => {
+          addLog(`Connection state: ${pc.connectionState}`);
+          
+          if (pc.connectionState === 'connected') {
+            updateStatus('connected', 'Connected');
+          } else if (pc.connectionState === 'disconnected' || 
+                 pc.connectionState === 'failed') {
+            updateStatus('disconnected', 'Disconnected');
+            stopRecognition();
+          }
+        };
+
+        // Create and send offer
+        updateStatus('connecting', 'Connecting...');
+        addLog('Creating WebRTC offer...');
+        
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+
+        // Send offer to server
+        const response = await fetch('http://localhost:8081/offer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sdp: pc.localDescription.sdp,
+            type: pc.localDescription.type
+          })
+        });
+
+        const answer = await response.json();
+        clientId = answer.clientId;
+        clientIdElement.textContent = `Client ID: ${clientId}`;
+        
+        addLog(`Connected with ID: ${clientId.substring(0, 8)}...`);
+
+        // Set remote description
+        await pc.setRemoteDescription(new RTCSessionDescription({
+          sdp: answer.sdp,
+          type: answer.type
+        }));
+
+        updateStatus('connected', 'Connected & Listening');
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        
+        addLog('Recognition started! Speak now...');
+
+      } catch (error) {
+        console.error('Error starting recognition:', error);
+        addLog(`Error: ${error.message}`);
+        updateStatus('disconnected', 'Connection failed');
+      }
+    }
+
+    function stopRecognition() {
+      if (pc) {
+        pc.close();
+        pc = null;
+      }
+
+      if (localStream) {
+        localStream.getTracks().forEach(track => {
+          track.stop();
+        });
+        
+        localStream = null;
+      }
+
+      if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+      }
+
+      // Reset visualizer
+      visualizerBars.forEach(bar => {
+        bar.style.height = '5px';
+      });
+
+      updateStatus('disconnected', 'Disconnected');
+      startButton.disabled = false;
+      stopButton.disabled = true;
+      clientIdElement.textContent = 'Client ID: Not connected';
+      
+      addLog('Recognition stopped');
+    }
+
+    // Button event listeners
+    startButton.addEventListener('click', startRecognition);
+    stopButton.addEventListener('click', stopRecognition);
+
+    // Simulate receiving syllable detections (in real use, this would come from your WebSocket)
+    // For demo purposes, you can manually increment
+    window.syllableDetected = (syllable) => {
+      syllableCount++;
+      syllableCountElement.textContent = syllableCount;
+      addLog(`🎯 Detected: ${syllable}`);
+    };
+
+    addLog('Ready to start');
+  </script>
+</body>
+</html>

@@ -100,7 +100,7 @@ export default function Game() {
 					<Preload all />
 				</Suspense>
 			</Canvas>
-			<Hud />
+			{/* <Hud /> */}
 			<Menu ref={menuRef} />
 		</React.Fragment>
 	);

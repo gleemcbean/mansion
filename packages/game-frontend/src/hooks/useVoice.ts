@@ -260,6 +260,48 @@ export default function useVoice() {
 	}, []);
 
 	useEffect(() => {
+		if (!localStream.current) return;
+
+		const pc = new RTCPeerConnection(ICE_CONFIG);
+
+		localStream.current.getTracks().forEach((track) => {
+			pc.addTrack(track, localStream.current!);
+		});
+
+		(async () => {
+			const offer = await pc.createOffer();
+			await pc.setLocalDescription(offer);
+
+			if (!pc.localDescription) return;
+
+			const res = await fetch("http://localhost:8081/offer", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					sdp: pc.localDescription.sdp,
+					type: pc.localDescription.type,
+					uuid: client.uuid,
+				}),
+			});
+
+			const answer = await res.json();
+
+			await pc.setRemoteDescription(
+				new RTCSessionDescription({
+					type: answer.type,
+					sdp: answer.sdp,
+				}),
+			);
+		})();
+
+		return () => {
+			pc.close();
+		};
+	}, [localStream.current]);
+
+	useEffect(() => {
 		if (!localStream.current || !audioCtx.current) return;
 
 		players.forEach((p) => {

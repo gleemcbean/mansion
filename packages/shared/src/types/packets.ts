@@ -16,6 +16,7 @@ export enum ClientPacketType {
 	RTCSignalOffer = "rtc-signal-offer",
 	RTCSignalAnswer = "rtc-signal-answer",
 	RTCSignalCandidate = "rtc-signal-candidate",
+	VoiceSyllable = "voice-syllable",
 }
 
 export enum ServerPacketType {
@@ -59,6 +60,7 @@ export type ClientPacketMap = {
 	[ClientPacketType.RTCSignalOffer]: { to: UUID; from: UUID; sdp: string };
 	[ClientPacketType.RTCSignalAnswer]: { to: UUID; from: UUID; sdp: string };
 	[ClientPacketType.RTCSignalCandidate]: { to: UUID; from: UUID; candidate: RTCIceCandidateInit };
+	[ClientPacketType.VoiceSyllable]: { uuid: UUID; syllable: string }
 };
 
 // biome-ignore format: Package needs to be inlined

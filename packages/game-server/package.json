@@ -12,5 +12,8 @@
   "scripts": {
     "dev": "bun run --hot ./src/index.ts",
     "start": "bun run ./src/index.ts"
+  },
+  "dependencies": {
+    "canvas": "^3.2.1"
   }
 }

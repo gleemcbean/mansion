@@ -1,3 +1,4 @@
+import bookPageController from "./controllers/bookPage";
 import healthController from "./controllers/health";
 import upgradeController from "./controllers/upgrade";
 
@@ -10,6 +11,7 @@ export default async function router(
 
 		if (url.pathname === "/health") return healthController();
 		if (url.pathname === "/ws") return upgradeController(req, server);
+		if (url.pathname === "/book-page") return bookPageController(req);
 
 		return new Response("Not Found", { status: 404 });
 	} catch {

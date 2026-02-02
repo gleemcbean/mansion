@@ -18,7 +18,7 @@ export default function RoomManager() {
 				</mesh>
 			</RigidBody>
 			{map.rooms.map((room, i) => (
-				<Room key={`${i} + ${room.id}`} data={room} />
+				<Room key={`${i}${room.id}`} data={room} />
 			))}
 			{map.doors.map((door) => (
 				<Door key={door.position.toString()} data={door} />

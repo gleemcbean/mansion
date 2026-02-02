@@ -3,9 +3,11 @@ import Anomaly from "@/utils/Anomaly";
 import type { GameMap } from "@/utils/Map";
 
 export default class Doppelganger extends Anomaly {
-	public constructor() {
-		super("doppelganger", "Doppelgänger");
-	}
+	public static override id = "doppelganger";
+	public static override name = "Doppelgänger";
+
+	public static override description =
+		"A mysterious entity that mimics the appearance of fungies within the mansion.\nCast your spell before it gets too close.";
 
 	public override update(map: GameMap, deltaTime: number) {}
 

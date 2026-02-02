@@ -3,15 +3,19 @@ import Anomaly from "@/utils/Anomaly";
 import type { GameMap } from "@/utils/Map";
 
 export default class Tentacles extends Anomaly {
-	public constructor() {
-		super("tentacles", "Tentacles");
-	}
+	public static override id = "tentacles";
+	public static override name = "Tentacles";
+
+	public static override description =
+		"A sinister entity that lurks under the beds in the mansion, its tentacles reaching out to ensnare unsuspecting victims.\nKeep your distance from the beds to avoid its grasp.";
 
 	public override update(map: GameMap, deltaTime: number): void {}
 
 	public override spawn(map: GameMap): [Vec3, Vec3] | null {
 		const bedrooms = map.rooms.filter(
-			(r) => r.id.startsWith("bedroom") && !r.anomalies.includes(this.id),
+			(r) =>
+				r.id.startsWith("bedroom") &&
+				!r.anomalies.includes((this.constructor as typeof Anomaly).id),
 		);
 
 		if (bedrooms.length < 1) return null;
@@ -29,7 +33,7 @@ export default class Tentacles extends Anomaly {
 
 		this.rotation = [0, direction * (Math.PI / 2), 0];
 		this.position = [x, 0.1, z];
-		room.anomalies.push(this.id);
+		room.anomalies.push((this.constructor as typeof Anomaly).id);
 
 		return [this.position, this.rotation];
 	}

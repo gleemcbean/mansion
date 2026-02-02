@@ -37,6 +37,8 @@ export default {
 		if (ws.data.lobby) events.get(ClientPacketType.LeaveGame)?.(ws, {});
 	},
 	message(ws, message) {
+		console.log(message);
+
 		try {
 			const parsed: MessageType = JSON.parse(message.toString());
 			if (!parsed.type) return;
