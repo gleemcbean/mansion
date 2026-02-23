@@ -6,19 +6,27 @@ services:
       - game-server
     ports:
       - "3000:3000"
-  game_server:
+    environment:
+      - BUN_INSTALL=/usr/local/bin/bun
+    volumes:
+      - ./packages/game-frontend:/app
+      - ./packages/shared:/shared
+  game-server:
     build: ./packages/game-server
+    env_file:
+      - ./packages/game-server/.env
     ports:
-      - "8080:8080"
+      - "4000:4000"
     environment:
       - BUN_INSTALL=/usr/local/bin/bun
     volumes:
       - ./packages/game-server:/app
+      - ./packages/shared:/shared
   speech-api:
-    build: ./packages/speech-api
+    build: ./packages/speech-service
     environment:
       - PYTHONUNBUFFERED=1
     ports:
-      - "9000:9000"
+      - "4001:4001"
     volumes:
-      - ./packages/speech-api/models:/app/models
+      - ./packages/speech-service/src:/app

@@ -1,1 +1,4 @@
-- [ ] Crouch animation
+- PORTS : 
+    - `game-fronted` &rarr; `3000`
+    - `game-server` &rarr; `4000`
+    - `speech-service` &rarr; `4001`

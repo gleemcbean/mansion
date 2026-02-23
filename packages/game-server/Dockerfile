@@ -1,8 +1,11 @@
 FROM oven/bun:latest
 
 WORKDIR /app
-COPY . /app
 
-RUN bun install --production
+COPY package.json bun.lock ./
+
+RUN bun install
+
+EXPOSE 4000
 
 CMD ["bun", "run", "start"]

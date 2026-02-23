@@ -2,7 +2,8 @@ import router from "@/http/routes";
 import ws from "@/ws";
 
 const server = Bun.serve({
-	port: Bun.env.PORT,
+	port: Bun.env.PORT || 4000,
+	hostname: Bun.env.HOSTNAME || "0.0.0.0",
 	fetch: router,
 	websocket: ws,
 	development: {
