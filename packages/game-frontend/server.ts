@@ -55,7 +55,9 @@ app.get("/:code", async (req, res) => {
   return res.cookie("code", code).redirect("/");
 });
 
-const server = await app.listen(process.env.PORT);
+const PORT = process.env.PORT || 3000;
+
+const server = await app.listen(PORT);
 const address = server.address() as AddressInfo;
 
 console.log(`Server running on http://localhost:${address.port}`);

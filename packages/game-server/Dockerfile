@@ -1,11 +1,13 @@
 FROM oven/bun:latest
 
-WORKDIR /app
+WORKDIR /app/packages/game-server
 
-COPY package.json bun.lock ./
+COPY packages/game-server/ ./
+COPY packages/shared/ /app/packages/shared
+
 
 RUN bun install
 
-EXPOSE 4000
+EXPOSE 8080
 
 CMD ["bun", "run", "start"]

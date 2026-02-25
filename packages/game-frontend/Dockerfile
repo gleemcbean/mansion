@@ -1,8 +1,9 @@
 FROM oven/bun:latest
 
-WORKDIR /app
+WORKDIR /app/packages/game-frontend
 
-COPY package.json bun.lock ./
+COPY packages/game-frontend/ ./
+COPY packages/shared/ /app/packages/shared
 
 RUN bun install 
 

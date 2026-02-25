@@ -1,32 +1,41 @@
-version: "3.8"
 services:
   game-frontend:
-    build: ./packages/game-frontend
+    build: 
+      context: .
+      dockerfile: packages/game-frontend/Dockerfile
     depends_on:
       - game-server
     ports:
       - "3000:3000"
     environment:
       - BUN_INSTALL=/usr/local/bin/bun
-    volumes:
-      - ./packages/game-frontend:/app
-      - ./packages/shared:/shared
+    networks:
+      - game-network
   game-server:
-    build: ./packages/game-server
+    build: 
+      context: .
+      dockerfile: packages/game-server/Dockerfile
     env_file:
       - ./packages/game-server/.env
     ports:
-      - "4000:4000"
+      - "8080:8080"
     environment:
       - BUN_INSTALL=/usr/local/bin/bun
-    volumes:
-      - ./packages/game-server:/app
-      - ./packages/shared:/shared
-  speech-api:
-    build: ./packages/speech-service
+    networks:
+      - game-network
+  speech-service:
+    build: 
+      context: .
+      dockerfile: packages/speech-service/Dockerfile
     environment:
       - PYTHONUNBUFFERED=1
     ports:
       - "4001:4001"
-    volumes:
-      - ./packages/speech-service/src:/app
+    networks:
+      - game-network
+
+networks:
+  game-network: 
+    driver: bridge
+    
+  
