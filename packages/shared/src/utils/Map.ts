@@ -72,6 +72,10 @@ export class GameMap {
 
 		return { min: [minX, minY], max: [maxX, maxY] };
 	}
+
+	public get doorCount() {
+		return this.doors.length;
+	}
 }
 
 export class Room {

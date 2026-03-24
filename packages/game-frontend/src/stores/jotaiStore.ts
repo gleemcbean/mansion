@@ -27,6 +27,7 @@ export const clientAtom = atom<Client | null>(null);
 export const optionsAtom = atomWithStorage("options", DEFAULT_OPTIONS);
 export const gameDataAtom = atom<PlayerGameData | null>(null);
 export const roomAtom = atom("");
+export const selectorTooltipAtom = atom<string | null>(null);
 
 export const wsAtom = atom<WebSocket | null>(null);
 export const wsHandlersAtom = atom(new Map<ServerPacketType, PacketSet>());

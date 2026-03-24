@@ -1,4 +1,5 @@
 import {
+	M_DOOR_OPEN_PROB,
 	M_LEAF_GENERATION_STEP,
 	M_MAX_ROOMS,
 	ROOMS,
@@ -58,13 +59,16 @@ export default class Generators {
 
 				if (foundDoor) {
 					foundDoor.openable = true;
+					foundDoor.opened = Math.random() <= M_DOOR_OPEN_PROB;
 					return;
 				}
 
 				const door: Door = {
+					id: map.doorCount + 1,
 					position: doorPoint.position,
 					direction: doorPoint.direction,
 					openable: false,
+					opened: false,
 				};
 
 				map.doors.push(door);
@@ -110,6 +114,7 @@ export default class Generators {
 
 				if (positioned) {
 					door.openable = true;
+					door.opened = Math.random() <= M_DOOR_OPEN_PROB;
 
 					available.splice(
 						available.findIndex(

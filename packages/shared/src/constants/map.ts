@@ -48,8 +48,8 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
 		.setTopology([0, 0], [2, 0], [2, 1.5], [0, 1.5])
 		.addDoorPoint(0.5, 0, CardinalDirection.South),
 	new Room("garage", "Garage", 2)
-		.setTopology([0, 0], [4, 0], [4, 6], [0, 6])
-		.addDoorPoint(2.5, 6, CardinalDirection.North)
+		.setTopology([0, 0], [6, 0], [6, 4], [0, 4])
+		.addDoorPoint(0, 2.5, CardinalDirection.North)
 		.addSpawn(2, 1),
 	new Room("bathroom", "Bathroom", 2)
 		.setTopology([1, 1], [1, 0], [5, 0], [5, 2], [4, 2], [3, 3], [3, 5], [1, 5], [1, 3], [0, 3], [0, 1])
@@ -64,3 +64,4 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
 
 export const M_MAX_ROOMS = 15;
 export const M_LEAF_GENERATION_STEP = 1;
+export const M_DOOR_OPEN_PROB = 0.2;

@@ -33,6 +33,7 @@ import usePlayer from "@/hooks/useClient";
 import useClient from "@/hooks/useClient";
 import useLobby from "@/hooks/useLobby";
 import useWebsocket from "@/hooks/useWebsocket";
+import Selector from "./Selector";
 
 type KeyboardControlsProps = {
 	spawn: Vec2;
@@ -104,7 +105,6 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 			if (now - lastSent.current < 50) return;
 			lastSent.current = now;
 			send(ClientPacketType.PlayerUpdate, { gameData: data });
-			console.log(camera.position.x, camera.position.z);
 		};
 
 		const oldEnergy = energy.current;
@@ -315,10 +315,12 @@ export default function KeyboardControls({ spawn }: KeyboardControlsProps) {
 				{ name: "jump", keys: keyify(options.up) },
 				{ name: "sprint", keys: keyify(options.sprint) },
 				{ name: "crouch", keys: keyify(options.crouch) },
+				{ name: "interact", keys: keyify(options.interact) },
 				{ name: "light", keys: keyify(options.light) },
 			]}
 		>
 			<KeyboardControlsLogic spawn={spawn} />
+			<Selector />
 		</DREIKeyboardControls>
 	);
 }

@@ -13,6 +13,7 @@ export enum ClientPacketType {
 	KickPlayer = "kick-player",
 	PromotePlayer = "promote-player",
 	PlayerUpdate = "player-update",
+	DoorToggle = "door-toggle",
 	RTCSignalOffer = "rtc-signal-offer",
 	RTCSignalAnswer = "rtc-signal-answer",
 	RTCSignalCandidate = "rtc-signal-candidate",
@@ -31,6 +32,7 @@ export enum ServerPacketType {
 	Kicked = "kicked",
 	GameStarted = "game-started",
 	PlayerUpdate = "player-update",
+	DoorToggle = "door-toggle",
 	RTCSignalOffer = "rtc-signal-offer",
 	RTCSignalAnswer = "rtc-signal-answer",
 	RTCSignalCandidate = "rtc-signal-candidate",
@@ -57,6 +59,7 @@ export type ClientPacketMap = {
 	[ClientPacketType.KickPlayer]: { uuid: UUID };
 	[ClientPacketType.PromotePlayer]: { uuid: UUID };
 	[ClientPacketType.PlayerUpdate]: { gameData: PlayerGameData };
+	[ClientPacketType.DoorToggle]: { doorId: number, isOpen: boolean }
 	[ClientPacketType.RTCSignalOffer]: { to: UUID; from: UUID; sdp: string };
 	[ClientPacketType.RTCSignalAnswer]: { to: UUID; from: UUID; sdp: string };
 	[ClientPacketType.RTCSignalCandidate]: { to: UUID; from: UUID; candidate: RTCIceCandidateInit };
@@ -76,6 +79,7 @@ export type ServerPacketMap = {
 	[ServerPacketType.Kicked]: {};
 	[ServerPacketType.GameStarted]: { metadata: LobbyMetadata; gameData: PlayerGameData, anomalies: Anomaly[] };
 	[ServerPacketType.PlayerUpdate]: { uuid: UUID; client: Client };
+	[ServerPacketType.DoorToggle]: { doorId: number, isOpen: boolean }
 	[ServerPacketType.RTCSignalOffer]: { from: UUID; sdp: string };
 	[ServerPacketType.RTCSignalAnswer]: { from: UUID; sdp: string };
 	[ServerPacketType.RTCSignalCandidate]: { from: UUID; candidate: RTCIceCandidateInit };

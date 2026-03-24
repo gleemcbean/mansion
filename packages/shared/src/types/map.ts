@@ -7,9 +7,11 @@ export type DoorPoint = {
 };
 
 export type Door = {
+	id: number;
 	position: Vec2;
 	direction: CardinalDirection;
 	openable: boolean;
+	opened: boolean;
 };
 
 export type Light = {

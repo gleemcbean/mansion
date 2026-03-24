@@ -6,11 +6,13 @@ import {
 	gameDataAtom,
 	optionsAtom,
 	roomAtom,
+	selectorTooltipAtom,
 } from "../stores/jotaiStore";
 
 export default function useClient() {
 	const [client, setClient] = useAtom(clientAtom);
 	const [options, setOptions] = useAtom(optionsAtom);
+	const [selectorTooltip, setSelectorTooltip] = useAtom(selectorTooltipAtom);
 	const [room, setRoom] = useAtom(roomAtom);
 	const store = useStore();
 
@@ -33,10 +35,12 @@ export default function useClient() {
 		client: client!,
 		options,
 		room,
+		selectorTooltip,
 		setClient,
 		setOption,
 		setRoom,
 		subGameData,
 		setGameData,
+		setSelectorTooltip,
 	};
 }

@@ -13,7 +13,6 @@ import Loading from "@/ui/modals/Loading";
 import Menu from "@/ui/modals/Menu";
 import KeyboardControls from "./components/controls/KeyboardControls";
 import PointerLockControls from "./components/controls/PointerLockControls";
-import Selector from "./components/controls/Selector";
 import AnomalyManager from "./components/managers/AnomalyManager";
 import MapManager from "./components/managers/MapManager";
 import PlayerManager from "./components/managers/PlayerManager";
@@ -86,11 +85,6 @@ export default function Game() {
 						numSolverIterations={8}
 					>
 						<KeyboardControls spawn={spawn} />
-						<Selector
-							// onHit={(obj) => console.log(obj)}
-							distance={2}
-							filter={(obj) => obj.name === "Door"}
-						/>
 						<PointerLockControls />
 						<MapManager />
 						<PlayerManager />
@@ -100,7 +94,7 @@ export default function Game() {
 					<Preload all />
 				</Suspense>
 			</Canvas>
-			{/* <Hud /> */}
+			<Hud />
 			<Menu ref={menuRef} />
 		</React.Fragment>
 	);
