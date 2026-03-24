@@ -55,6 +55,10 @@ export class GameMap {
 		return null;
 	}
 
+	public getDoor(doorId: number): Door | null {
+		return this.doors.find((d) => d.id === doorId) ?? null;
+	}
+
 	public bounds(): { min: Vec2; max: Vec2 } {
 		let minX = Infinity;
 		let minY = Infinity;

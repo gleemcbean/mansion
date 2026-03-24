@@ -37,15 +37,13 @@ export default {
 		if (ws.data.lobby) events.get(ClientPacketType.LeaveGame)?.(ws, {});
 	},
 	message(ws, message) {
-		console.log(message);
-
 		try {
 			const parsed: MessageType = JSON.parse(message.toString());
 			if (!parsed.type) return;
 
-			Logger.info(`Received message from ${ws.data.uuid}: '${parsed.type}'`, {
-				context: "WS",
-			});
+			// Logger.info(`Received message from ${ws.data.uuid}: '${parsed.type}'`, {
+			// 	context: "WS",
+			// });
 
 			events.get(parsed.type)?.(ws, parsed.data ?? {});
 		} catch (e) {

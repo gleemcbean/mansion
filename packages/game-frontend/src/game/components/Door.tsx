@@ -1,4 +1,8 @@
 import type { Door as DoorType } from "@mansion/shared/types/map";
+import {
+	ClientPacketType,
+	ServerPacketType,
+} from "@mansion/shared/types/packets";
 import { CardinalDirection } from "@mansion/shared/types/util";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
@@ -8,9 +12,10 @@ import {
 	type RapierRigidBody,
 	RigidBody,
 } from "@react-three/rapier";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { SkeletonUtils } from "three-stdlib";
+import useWebsocket from "@/hooks/useWebsocket";
 
 type DoorProps = {
 	data: DoorType;
@@ -21,12 +26,13 @@ export default function Door({ data }: DoorProps) {
 	const rigidBodyRef = useRef<RapierRigidBody>(null);
 	const colliderRef = useRef<RapierCollider>(null);
 	const isOpen = useRef(data.opened);
+	const targetRotation = useRef(0);
+
+	const { send, addHandler } = useWebsocket();
 
 	const openingDirectionMultiplicatorRef = useRef(
 		[-1, +1][Math.floor(Math.random() * 2)],
 	);
-
-	const targetRotation = useRef(0);
 
 	const { scene } = useGLTF(
 		data.openable ? "/models/door.glb" : "/models/locked_door.glb",
@@ -60,6 +66,18 @@ export default function Door({ data }: DoorProps) {
 		door.rotation.y = THREE.MathUtils.lerp(door.rotation.y, target, 5 * delta);
 	});
 
+	function setDoorState(state: boolean) {
+		if (!doorGroupRef.current) return;
+		const door = doorGroupRef.current.children[1];
+		if (!door) return;
+
+		isOpen.current = state;
+		colliderRef.current?.setEnabled(!isOpen.current);
+		targetRotation.current = isOpen.current
+			? (Math.PI / 1.4) * openingDirectionMultiplicatorRef.current
+			: 0;
+	}
+
 	useEffect(() => {
 		if (!doorGroupRef.current) return;
 
@@ -72,21 +90,30 @@ export default function Door({ data }: DoorProps) {
 
 		colliderRef.current?.setEnabled(!isOpen.current);
 
-		console.log(door.rotation.y);
-
 		group.userData.title = isOpen.current ? "Close Door" : "Open Door";
 		group.userData.execute = data.openable
 			? () => {
-					const door = group.children[1];
-					if (!door) return;
-					isOpen.current = !isOpen.current;
-					targetRotation.current = isOpen.current
-						? (Math.PI / 1.4) * openingDirectionMultiplicatorRef.current
-						: 0;
-					colliderRef.current?.setEnabled(!isOpen.current);
+					setDoorState(!isOpen.current);
+
+					send(ClientPacketType.DoorToggle, {
+						doorId: data.id,
+						isOpen: isOpen.current,
+					});
 				}
 			: null;
 	}, [doorGroupRef, data.openable]);
+
+	useLayoutEffect(() => {
+		const unsubscribe = addHandler(
+			ServerPacketType.DoorToggle,
+			({ doorId, isOpen }) => {
+				if (doorId !== data.id) return;
+				setDoorState(isOpen);
+			},
+		);
+
+		return unsubscribe;
+	}, []);
 
 	return (
 		<RigidBody
