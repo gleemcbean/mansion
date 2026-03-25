@@ -68,10 +68,12 @@ export default function Door({ data }: DoorProps) {
 
 	function setDoorState(state: boolean) {
 		if (!doorGroupRef.current) return;
-		const door = doorGroupRef.current.children[1];
+		const group = doorGroupRef.current;
+		const door = group.children[1];
 		if (!door) return;
 
 		isOpen.current = state;
+		group.userData.title = isOpen.current ? "Close the Door" : "Open the Door";
 		colliderRef.current?.setEnabled(!isOpen.current);
 		targetRotation.current = isOpen.current
 			? (Math.PI / 1.4) * openingDirectionMultiplicatorRef.current
@@ -90,7 +92,7 @@ export default function Door({ data }: DoorProps) {
 
 		colliderRef.current?.setEnabled(!isOpen.current);
 
-		group.userData.title = isOpen.current ? "Close Door" : "Open Door";
+		group.userData.title = isOpen.current ? "Close the Door" : "Open the Door";
 		group.userData.execute = data.openable
 			? () => {
 					setDoorState(!isOpen.current);

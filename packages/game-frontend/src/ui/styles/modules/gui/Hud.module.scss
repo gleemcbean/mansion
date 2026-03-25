@@ -30,4 +30,14 @@
     left: 50%;
     transform: translate(-50%, calc(-50% + 5rem));
   }
+
+  .topTooltip {
+    position: fixed;
+    right: 2rem;
+    top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 15rem;
+  }
 }

@@ -9,6 +9,7 @@ import useClient from "@/hooks/useClient";
 import ProgressBar from "../components/ProgressBar";
 import styles from "../styles/modules/gui/Hud.module.scss";
 import Minimap from "./Minimap";
+import Touch from "./Touch";
 
 export default function Hud() {
 	const { options, selectorTooltip, subGameData } = useClient();
@@ -54,10 +55,26 @@ export default function Hud() {
 			</div>
 			{selectorTooltip && (
 				<p className={styles.selectorTooltip}>
-					<span>Press 'E' to </span>
+					<span>
+						Press <Touch value="KeyE" /> to{" "}
+					</span>
 					<span>{selectorTooltip.toLowerCase()}</span>
 				</p>
 			)}
+			<div className={styles.topTooltip}>
+				<p>
+					<Touch value={options.sprint[0]!} />
+					<span> Sprint</span>
+				</p>
+				<p>
+					<Touch value={options.crouch[0]!} />
+					<span> Hide</span>
+				</p>
+				<p>
+					<Touch value={options.light[0]!} />
+					<span> Toggle flashlight</span>
+				</p>
+			</div>
 		</div>
 	);
 }

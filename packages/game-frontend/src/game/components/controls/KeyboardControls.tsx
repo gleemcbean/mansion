@@ -120,7 +120,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 
 		const crouched = height + 0.2 < PL_HEIGHT;
 		const sprinting = sprint && energy.current > 1 && !crouched;
-		const canLight = lighting.value && energy.current > 0;
+		const canLight = lighting.value && energy.current > 0 && !crouched;
 
 		if (sprinting && !options.godMode) energy.current -= delta * 10;
 		if (lighting.value && !options.godMode) energy.current -= delta * 6;
