@@ -2,6 +2,7 @@ import {
 	PL_MAX_HEALTH,
 	PL_MAX_STAMINA,
 } from "@mansion/shared/constants/player";
+import { useProgress } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa";
 import { FaBoltLightning } from "react-icons/fa6";
@@ -12,6 +13,7 @@ import Minimap from "./Minimap";
 import Touch from "./Touch";
 
 export default function Hud() {
+	const { active, progress } = useProgress();
 	const { options, selectorTooltip, subGameData } = useClient();
 	const [gameData, setGameData] = useState({
 		health: PL_MAX_HEALTH,
@@ -29,7 +31,7 @@ export default function Hud() {
 		return () => unsubscribe();
 	}, []);
 
-	if (!options.hud) return null;
+	if (!options.hud || active || progress < 100) return null;
 
 	return (
 		<div className={styles.container}>

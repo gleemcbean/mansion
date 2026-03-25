@@ -16,6 +16,7 @@ import PointerLockControls from "./components/controls/PointerLockControls";
 import AnomalyManager from "./components/managers/AnomalyManager";
 import MapManager from "./components/managers/MapManager";
 import PlayerManager from "./components/managers/PlayerManager";
+import PhysicsGate from "./components/PhysicsGate";
 import Stats from "./components/Stats";
 import PostProcessing from "./components/shaders/PostProcessing";
 import THREELoading from "./Loading";
@@ -79,17 +80,13 @@ export default function Game() {
 					<ambientLight intensity={1.2} color={new THREE.Color(0xecc4f5)} />
 					{options.showHelper && <axesHelper args={[50]} />}
 					{options.showHelper && <gridHelper args={[100, 100]} />}
-					<Physics
-						gravity={[0, options.fly ? 0 : -22, 0]}
-						debug={options.showHelper}
-						numSolverIterations={8}
-					>
+					<PhysicsGate>
 						<KeyboardControls spawn={spawn} />
 						<PointerLockControls />
 						<MapManager />
 						<PlayerManager />
 						<AnomalyManager />
-					</Physics>
+					</PhysicsGate>
 					<Stats />
 					<Preload all />
 				</Suspense>
