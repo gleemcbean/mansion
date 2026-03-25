@@ -56,7 +56,7 @@ export default function Hud() {
 			{selectorTooltip && (
 				<p className={styles.selectorTooltip}>
 					<span>
-						Press <Touch value="KeyE" /> to{" "}
+						Press <Touch value={options.interact[0]!} /> to{" "}
 					</span>
 					<span>{selectorTooltip.toLowerCase()}</span>
 				</p>
