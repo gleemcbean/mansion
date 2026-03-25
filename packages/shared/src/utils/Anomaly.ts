@@ -1,4 +1,5 @@
 import type { Vec3 } from "@/types/util";
+import type { PlayerGameData } from "../types/player";
 import type { GameMap } from "./Map";
 
 export default abstract class Anomaly {
@@ -9,7 +10,11 @@ export default abstract class Anomaly {
 	public static name: string;
 	public static description: string;
 
-	public abstract update(map: GameMap, deltaTime: number): void;
+	public abstract update(
+		map: GameMap,
+		players: PlayerGameData[],
+		deltaTime: number,
+	): void;
 
 	public abstract spawn(map: GameMap): [Vec3, Vec3] | null;
 

@@ -74,7 +74,12 @@ export default function Door({ data }: DoorProps) {
 
 		isOpen.current = state;
 		group.userData.title = isOpen.current ? "Close the Door" : "Open the Door";
-		colliderRef.current?.setEnabled(!isOpen.current);
+
+		setTimeout(
+			() => colliderRef.current?.setEnabled(!isOpen.current),
+			isOpen.current ? 0 : 250,
+		);
+
 		targetRotation.current = isOpen.current
 			? (Math.PI / 1.4) * openingDirectionMultiplicatorRef.current
 			: 0;

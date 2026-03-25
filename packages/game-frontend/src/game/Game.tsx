@@ -1,7 +1,6 @@
 import type { Vec2 } from "@mansion/shared/types/util";
 import { Preload } from "@react-three/drei";
 import { Canvas, events } from "@react-three/fiber";
-import { Physics } from "@react-three/rapier";
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { DEFAULT_OPTIONS, type Options } from "@/constants/Options";

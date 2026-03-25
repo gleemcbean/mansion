@@ -1,3 +1,4 @@
+import type { PlayerGameData } from "@/types/player";
 import type { Vec3 } from "@/types/util";
 import Anomaly from "@/utils/Anomaly";
 import type { GameMap } from "@/utils/Map";
@@ -9,7 +10,11 @@ export default class Doppelganger extends Anomaly {
 	public static override description =
 		"A mysterious entity that mimics the appearance of fungies within the mansion.\nCast your spell before it gets too close.";
 
-	public override update(map: GameMap, deltaTime: number) {}
+	public override update(
+		map: GameMap,
+		players: PlayerGameData[],
+		deltaTime: number,
+	) {}
 
 	public override spawn(map: GameMap): [Vec3, Vec3] | null {
 		const spawn = map.randomSpawn();

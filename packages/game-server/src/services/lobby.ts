@@ -158,7 +158,14 @@ export class Lobby {
 
 		this.updateLoop = setInterval(() => {
 			this.anomalies.forEach((anomaly) => {
-				anomaly.update(this.metadata.map!, Date.now() - lastUpdate);
+				anomaly.update(
+					this.metadata.map!,
+					this.players
+						.values()
+						.toArray()
+						.map((wsClient) => wsClient.playerData!.gameData!),
+					Date.now() - lastUpdate,
+				);
 				lastUpdate = Date.now();
 			});
 		}, 1000 / 20);

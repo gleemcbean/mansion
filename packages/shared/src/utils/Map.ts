@@ -8,6 +8,10 @@ type TranslateReturn<T> = T extends undefined
 
 const EPS = 1e-6;
 
+export function transform2dVec(vec: Vec3): Vec2 {
+	return [vec[0], vec[2]];
+}
+
 export class GameMap {
 	public usedSpawns: Vec2[] = [];
 
@@ -50,6 +54,14 @@ export class GameMap {
 			) {
 				return door;
 			}
+		}
+
+		return null;
+	}
+
+	public roomAt(position: Vec2): PositionedRoom | null {
+		for (const room of this.rooms) {
+			if (room.pointIn(position)) return room;
 		}
 
 		return null;
