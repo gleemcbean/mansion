@@ -21,7 +21,7 @@ import {
 	KeyboardControls as DREIKeyboardControls,
 	useKeyboardControls,
 } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import {
 	CapsuleCollider,
 	type RapierRigidBody,
@@ -60,11 +60,9 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 	const oldPos = useRef(new THREE.Vector3());
 	const jRaycaster = useRef(new THREE.Raycaster());
 	const cRaycaster = useRef(new THREE.Raycaster());
-	const currentPlayerVolume = useRef(PL_VOLUME);
 
 	const { 1: get } = useKeyboardControls();
-	const { camera } = useThree();
-	const { options, room, setRoom, setGameData } = useClient();
+	const { options, room, bookOpen, setRoom, setGameData } = useClient();
 	const { metadata } = useLobby();
 	const { send } = useWebsocket();
 
@@ -99,7 +97,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 		};
 	}, [targetHeight.current]);
 
-	useFrame(({ scene }, delta) => {
+	useFrame(({ scene, camera }, delta) => {
 		if (!body.current) return;
 
 		const sendPosPacket = (data: PlayerGameData) => {
@@ -121,12 +119,12 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 		};
 
 		const keys = get();
-		const forward = Number(keys.forward);
-		const backward = Number(keys.backward);
-		const left = Number(keys.left);
-		const right = Number(keys.right);
+		const forward = Number(keys.forward && !bookOpen);
+		const backward = Number(keys.backward && !bookOpen);
+		const left = Number(keys.left && !bookOpen);
+		const right = Number(keys.right && !bookOpen);
 		const sprint = keys.sprint;
-		const jump = keys.jump;
+		const jump = keys.jump && !bookOpen;
 		const crouch = keys.crouch && !options.fly;
 		const lightPressed = keys.light;
 

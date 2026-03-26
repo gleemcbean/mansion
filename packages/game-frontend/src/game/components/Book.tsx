@@ -1,8 +1,8 @@
-import type Anomaly from "@mansion/shared/utils/Anomaly";
 import { useAnimations, useGLTF, useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import useClient from "@/hooks/useClient";
 import useLobby from "@/hooks/useLobby";
 
 const BOOK_HALF_WIDTH = 0.64 / 2;
@@ -34,27 +34,31 @@ export default function Book() {
 	const raycaster = new THREE.Raycaster();
 	const currentPosition = new THREE.Vector3();
 	const { anomalies } = useLobby();
+	const { setBookOpen } = useClient();
 	const isOpen = useRef(false);
 	const interactingRef = useRef(false);
+	const leftPageRef = useRef(false);
+	const rightPageRef = useRef(false);
 	const { 1: get } = useKeyboardControls();
 	const targetPositions = useRef([idleOffsetPosition, idleQuaternion]);
-
-	const { actions, mixer } = useAnimations(animations, scene);
-
-	const pages = useRef<[Anomaly, Anomaly]>(
-		anomalies.slice(0, 2) as [Anomaly, Anomaly],
-	);
+	const { actions } = useAnimations(animations, scene);
+	const page = useRef(0);
 
 	useFrame(({ camera, scene }, deltaTime) => {
 		if (!bookRef.current) return;
 
 		const keys = get();
-		let interacting = false;
-		interacting = !interactingRef.current && keys.book;
+		const interacting = !interactingRef.current && keys.book;
+		const rightPage = !rightPageRef.current && keys.left;
+		const leftPage = !leftPageRef.current && keys.right;
+
 		interactingRef.current = keys.book;
+		leftPageRef.current = keys.right;
+		rightPageRef.current = keys.left;
 
 		if (interacting) {
 			isOpen.current = !isOpen.current;
+			setBookOpen(isOpen.current);
 
 			targetPositions.current = isOpen.current
 				? [focusOffsetPosition, focusOffsetQuaternion]
@@ -63,12 +67,54 @@ export default function Book() {
 			const action = actions.NlaTrack1;
 
 			if (action) {
-				action.timeScale = [-1, +1][+isOpen.current] * deltaTime * 300;
+				action.timeScale = [-1, +1][+isOpen.current] * 3;
 				action.paused = false;
 				action.loop = THREE.LoopOnce;
 				action.clampWhenFinished = true;
 				action.play();
 			}
+		}
+
+		const plane1 = scene.getObjectByName("Plane_1")!;
+		const plane2 = scene.getObjectByName("Plane_2")!;
+
+		if (isOpen.current) {
+			const leftAction = actions.NlaTrack2;
+			const rightAction = actions["NlaTrack.3"];
+
+			if (leftAction && leftPage && page.current < anomalies.length / 2 - 1) {
+				leftAction.play();
+				leftAction.time = 1.8;
+				leftAction.timeScale = 2;
+				leftAction.loop = THREE.LoopOnce;
+				leftAction.clampWhenFinished = true;
+				plane1.visible = plane2.visible = true;
+				page.current++;
+				loadPageTextures(true);
+			}
+
+			if (rightAction && rightPage && page.current > 0) {
+				rightAction.play();
+				rightAction.time = 2.4;
+				rightAction.timeScale = 2;
+				rightAction.loop = THREE.LoopOnce;
+				rightAction.clampWhenFinished = true;
+				plane1.visible = plane2.visible = true;
+				page.current--;
+				loadPageTextures(false);
+			}
+
+			if (
+				!leftAction?.isRunning() &&
+				!rightAction?.isRunning() &&
+				(plane1.visible || plane2.visible)
+			) {
+				plane1.visible = plane2.visible = false;
+				leftAction?.stop();
+				rightAction?.stop();
+			}
+		} else if (plane1.visible || plane2.visible) {
+			plane1.visible = plane2.visible = false;
 		}
 
 		const [offsetPosition, offsetQuaternion] = targetPositions.current as [
@@ -121,13 +167,14 @@ export default function Book() {
 		let found: THREE.MeshStandardMaterial | null = null;
 
 		scene.traverse((child) => {
-			if ((child as THREE.Mesh).isMesh) {
-				const mat = (
-					(child as THREE.Mesh).material as THREE.MeshStandardMaterial
-				).clone();
+			const mesh = child as THREE.Mesh;
+			if (!mesh.isMesh) return;
 
-				(child as THREE.Mesh).material = mat;
-				if (mat.name === name) found = mat;
+			const mat = mesh.material as THREE.MeshStandardMaterial;
+			if (mat.name === name) {
+				const cloned = mat.clone();
+				mesh.material = cloned;
+				found = cloned;
 			}
 		});
 
@@ -148,28 +195,53 @@ export default function Book() {
 		});
 	};
 
+	const loadPageTextures = (rotatingLeft: boolean | null = null) => {
+		for (let i = 0; i < 2; i++) {
+			const anomaly = anomalies[page.current * 2 + i];
+			const material = getMaterialByName(scene, BOOK_PAGES[i])!;
+			const url = new URL("http://localhost:8080/book-page");
+
+			if (anomaly) {
+				url.searchParams.append(
+					"d",
+					btoa(
+						JSON.stringify({
+							step: 0,
+							anomaly: anomaly.id,
+							syllables: anomaly.syllables,
+						}),
+					),
+				);
+			}
+
+			if (rotatingLeft === true && i === 0) {
+				setTimeout(() => replaceTexture(material, url.toString()), 150);
+				continue;
+			}
+
+			if (rotatingLeft === false && i === 1) {
+				setTimeout(() => replaceTexture(material, url.toString()), 150);
+				continue;
+			}
+
+			replaceTexture(material, url.toString());
+		}
+	};
+
 	useEffect(() => {
-		scene.traverse((obj) => {
-			// if (obj.isBone) console.log(obj);
-		});
+		const action = actions.NlaTrack1;
+
+		if (action) {
+			action.timeScale = -Infinity;
+			action.loop = THREE.LoopOnce;
+			action.clampWhenFinished = true;
+			action.play();
+		}
 
 		scene.getObjectByName("Plane_1")!.visible = false;
 		scene.getObjectByName("Plane_2")!.visible = false;
 
-		pages.current.forEach((anomaly, index) => {
-			const pageHash = btoa(
-				JSON.stringify({
-					step: 0,
-					anomaly: anomaly.id,
-					syllables: anomaly.syllables,
-				}),
-			);
-
-			replaceTexture(
-				getMaterialByName(scene, BOOK_PAGES[index])!,
-				`http://localhost:8080/book-page?d=${pageHash}`,
-			);
-		});
+		loadPageTextures();
 	}, []);
 
 	return (

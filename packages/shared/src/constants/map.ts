@@ -16,7 +16,7 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
 	new Room("bedroom1", "Bedroom", 2)
 		.setTopology([0, 0], [6, 0], [6, 4], [4, 4], [4, 3], [0, 3])
 		.addDoorPoint(0, 2.5, CardinalDirection.East)
-		.addSpawn(1, 1)
+		.addSpawn(2.75, 2)
 		// .addLight(1.5, 1.2, 0.25, { intensity: 2, decay: 2, color: 0x56f59b, target: [0, -0.5, 0] })
 		.addLight(5.75, 1, 1.6, { intensity: 3 }),
 	new Room("bedroom2", "Bedroom", 2)

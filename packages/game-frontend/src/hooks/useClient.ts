@@ -2,6 +2,7 @@ import type { PlayerGameData } from "@mansion/shared/types/player";
 import { useAtom, useStore } from "jotai";
 import type { Options } from "@/constants/Options";
 import {
+	bookOpenAtom,
 	clientAtom,
 	gameDataAtom,
 	optionsAtom,
@@ -11,6 +12,7 @@ import {
 
 export default function useClient() {
 	const [client, setClient] = useAtom(clientAtom);
+	const [bookOpen, setBookOpen] = useAtom(bookOpenAtom);
 	const [options, setOptions] = useAtom(optionsAtom);
 	const [selectorTooltip, setSelectorTooltip] = useAtom(selectorTooltipAtom);
 	const [room, setRoom] = useAtom(roomAtom);
@@ -36,11 +38,13 @@ export default function useClient() {
 		options,
 		room,
 		selectorTooltip,
+		bookOpen,
 		setClient,
 		setOption,
 		setRoom,
 		subGameData,
 		setGameData,
 		setSelectorTooltip,
+		setBookOpen,
 	};
 }

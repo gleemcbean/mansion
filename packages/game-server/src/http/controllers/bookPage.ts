@@ -64,105 +64,104 @@ export default async function bookPageController(req: Request) {
 	const url = new URL(req.url);
 	const rawPageContent = url.searchParams.get("d");
 
-	if (!rawPageContent) {
-		return new Response("Bad Request: Missing 'd' query parameter", {
-			status: 400,
-		});
-	}
-
 	try {
-		const pageContent: PageContent = JSON.parse(
-			atob(decodeURIComponent(rawPageContent)),
-		);
-
-		if (
-			!pageContent.syllables ||
-			!Array.isArray(pageContent.syllables) ||
-			pageContent.syllables.length < 2 ||
-			typeof pageContent.anomaly !== "string" ||
-			pageContent.anomaly.length === 0 ||
-			typeof pageContent.step !== "number" ||
-			pageContent.step >= pageContent.syllables.length
-		) {
-			return new Response("Bad Request: Invalid 'd' query parameter", {
-				status: 400,
-			});
-		}
-
-		const Anomaly: typeof AnomalyType | null = ANOMALIES.get(
-			pageContent.anomaly,
-		);
-
-		if (!Anomaly) {
-			return new Response("Bad Request: Invalid anomaly type", {
-				status: 400,
-			});
-		}
-
-		const [background, anomalyImage] = await Promise.all([
-			loadImage(path.join(__dirname, "../../assets/images/page-texture.jpg")),
-			loadImage(
-				path.join(__dirname, `../../assets/images/anomalies/${Anomaly.id}.png`),
-			),
-		]);
-
-		ctx.drawImage(background, 0, 0, BOOK_WIDTH, BOOK_HEIGHT);
-
-		ctx.fillStyle = TEXT_COLOR;
-		ctx.textAlign = "left";
-		ctx.font = "70px BadHandwriter";
-
-		ctx.fillText(
-			Anomaly.name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
-			PAGE_PADDING,
-			PAGE_PADDING + 40,
-		);
-
-		ctx.fillStyle = `${TEXT_COLOR}dd`;
-		ctx.font = "30px MQSMagic";
-		const lines = textWrap(
-			ctx,
-			Anomaly.description,
-			BOOK_WIDTH - PAGE_PADDING * 2,
-		);
-
-		let y = PAGE_PADDING + 100;
-		for (const line of lines) {
-			ctx.fillText(line, PAGE_PADDING, y);
-			y += 30;
-		}
-
-		ctx.globalAlpha = 0.8;
-		const size = canvas.height - y - PAGE_PADDING - 50;
-		ctx.drawImage(anomalyImage, canvas.width / 2 - size / 2, y, size, size);
-		ctx.globalAlpha = 1.0;
-
-		ctx.font = "45px BadHandwriter";
-
-		let space = 0;
-		for (const [index, syllable] of pageContent.syllables.entries()) {
-			if (index < pageContent.step) {
-				ctx.fillStyle = `${TEXT_COLOR}88`;
-			} else {
-				ctx.fillStyle = TEXT_COLOR;
-			}
-
-			ctx.fillText(
-				syllable,
-				PAGE_PADDING + space,
-				canvas.height - PAGE_PADDING,
+		if (rawPageContent) {
+			const pageContent: PageContent = JSON.parse(
+				atob(decodeURIComponent(rawPageContent)),
 			);
 
-			space +=
-				ctx.measureText(syllable).width +
-				(index < pageContent.syllables.length - 1 ? 30 : 0);
+			if (
+				!pageContent.syllables ||
+				!Array.isArray(pageContent.syllables) ||
+				pageContent.syllables.length < 2 ||
+				typeof pageContent.anomaly !== "string" ||
+				pageContent.anomaly.length === 0 ||
+				typeof pageContent.step !== "number" ||
+				pageContent.step >= pageContent.syllables.length
+			) {
+				return new Response("Bad Request: Invalid 'd' query parameter", {
+					status: 400,
+				});
+			}
+
+			const Anomaly: typeof AnomalyType | null = ANOMALIES.get(
+				pageContent.anomaly,
+			);
+
+			if (!Anomaly) {
+				return new Response("Bad Request: Invalid anomaly type", {
+					status: 400,
+				});
+			}
+
+			const [background, anomalyImage] = await Promise.all([
+				loadImage(path.join(__dirname, "../../assets/images/page-texture.jpg")),
+				loadImage(
+					path.join(
+						__dirname,
+						`../../assets/images/anomalies/${Anomaly.id}.png`,
+					),
+				),
+			]);
+
+			ctx.drawImage(background, 0, 0, BOOK_WIDTH, BOOK_HEIGHT);
+
+			ctx.fillStyle = TEXT_COLOR;
+			ctx.textAlign = "left";
+			ctx.font = "70px BadHandwriter";
+
+			ctx.fillText(
+				Anomaly.name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+				PAGE_PADDING,
+				PAGE_PADDING + 40,
+			);
+
+			ctx.fillStyle = `${TEXT_COLOR}dd`;
+			ctx.font = "30px MQSMagic";
+			const lines = textWrap(
+				ctx,
+				Anomaly.description,
+				BOOK_WIDTH - PAGE_PADDING * 2,
+			);
+
+			let y = PAGE_PADDING + 100;
+			for (const line of lines) {
+				ctx.fillText(line, PAGE_PADDING, y);
+				y += 30;
+			}
+
+			ctx.globalAlpha = 0.8;
+			const size = canvas.height - y - PAGE_PADDING - 50;
+			ctx.drawImage(anomalyImage, canvas.width / 2 - size / 2, y, size, size);
+			ctx.globalAlpha = 1.0;
+
+			ctx.font = "45px BadHandwriter";
+
+			let space = 0;
+			for (const [index, syllable] of pageContent.syllables.entries()) {
+				if (index < pageContent.step) {
+					ctx.fillStyle = `${TEXT_COLOR}88`;
+				} else {
+					ctx.fillStyle = TEXT_COLOR;
+				}
+
+				ctx.fillText(
+					syllable,
+					PAGE_PADDING + space,
+					canvas.height - PAGE_PADDING,
+				);
+
+				space +=
+					ctx.measureText(syllable).width +
+					(index < pageContent.syllables.length - 1 ? 30 : 0);
+			}
+		} else {
+			const background = await loadImage(
+				path.join(__dirname, "../../assets/images/page-texture.jpg"),
+			);
+
+			ctx.drawImage(background, 0, 0, BOOK_WIDTH, BOOK_HEIGHT);
 		}
-
-		const imageBuffer = canvas.toBuffer("image/png");
-
-		return new Response(imageBuffer, {
-			headers: { "Content-Type": "image/png" },
-		});
 	} catch (error) {
 		console.error(error);
 
@@ -170,4 +169,10 @@ export default async function bookPageController(req: Request) {
 			status: 400,
 		});
 	}
+
+	const imageBuffer = canvas.toBuffer("image/png");
+
+	return new Response(imageBuffer, {
+		headers: { "Content-Type": "image/png" },
+	});
 }

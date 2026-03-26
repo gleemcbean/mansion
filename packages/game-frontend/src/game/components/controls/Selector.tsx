@@ -36,8 +36,7 @@ export default function Selector({ distance = 1 }: SelectorProps) {
 	useFrame(({ camera, scene }) => {
 		const keys = get();
 
-		let interacting = false;
-		interacting = !interactingRef.current && keys.interact;
+		const interacting = !interactingRef.current && keys.interact;
 		interactingRef.current = keys.interact;
 
 		const origin = camera.getWorldPosition(new THREE.Vector3());
