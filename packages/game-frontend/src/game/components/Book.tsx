@@ -196,9 +196,15 @@ export default function Book() {
 	};
 
 	const loadPageTextures = (rotatingLeft: boolean | null = null) => {
+		const materials: THREE.MeshStandardMaterial[] = [];
+		const newUrls: string[] = [];
+
+		for (let i = 0; i < 2; i++) {
+			materials.push(getMaterialByName(scene, BOOK_PAGES[i])!);
+		}
+
 		for (let i = 0; i < 2; i++) {
 			const anomaly = anomalies[page.current * 2 + i];
-			const material = getMaterialByName(scene, BOOK_PAGES[i])!;
 			const url = new URL("http://localhost:8080/book-page");
 
 			if (anomaly) {
@@ -214,18 +220,32 @@ export default function Book() {
 				);
 			}
 
-			if (rotatingLeft === true && i === 0) {
-				setTimeout(() => replaceTexture(material, url.toString()), 150);
-				continue;
-			}
-
-			if (rotatingLeft === false && i === 1) {
-				setTimeout(() => replaceTexture(material, url.toString()), 150);
-				continue;
-			}
-
-			replaceTexture(material, url.toString());
+			newUrls[i] = url.toString();
 		}
+
+		const [leftMaterial, rightMaterial] = materials;
+		const [leftNewUrl, rightNewUrl] = newUrls;
+		const plane1 = scene.getObjectByName("Plane_1") as THREE.Mesh;
+		const plane2 = scene.getObjectByName("Plane_2") as THREE.Mesh;
+
+		if (rotatingLeft === true) {
+			(plane1.material as THREE.MeshStandardMaterial).copy(rightMaterial);
+
+			replaceTexture(rightMaterial, rightNewUrl);
+			setTimeout(() => replaceTexture(leftMaterial, leftNewUrl), 150);
+			return;
+		}
+
+		if (rotatingLeft === false) {
+			(plane2.material as THREE.MeshStandardMaterial).copy(leftMaterial);
+
+			replaceTexture(leftMaterial, leftNewUrl);
+			setTimeout(() => replaceTexture(rightMaterial, rightNewUrl), 150);
+			return;
+		}
+
+		replaceTexture(leftMaterial, leftNewUrl);
+		replaceTexture(rightMaterial, rightNewUrl);
 	};
 
 	useEffect(() => {
