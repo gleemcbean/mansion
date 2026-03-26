@@ -8,6 +8,7 @@ export default class Phantom extends Anomaly {
 	public static override name = "Phantom";
 
 	private room: PositionedRoom | null = null;
+	private damageMode = false;
 
 	public static override description =
 		"A ghostly entity that haunts the corridors of the mansion, instilling fear in those who cross its path.\nStay out of the red lights to avoid its wrath.";
@@ -19,13 +20,31 @@ export default class Phantom extends Anomaly {
 	): void {
 		if (!this.room) return;
 
+		let damageMode = false;
+
 		if (
 			players
 				.filter((p) => this.room!.pointIn(transform2dVec(p.position)))
 				.some((p) => !p.crouched)
 		) {
-			// this.room.lights.
+			damageMode = true;
 		}
+
+		if (damageMode && !this.damageMode) {
+			this.room.lights.forEach((light) => {
+				light.color = 0xc7001b;
+				light.intensity = 2;
+			});
+		}
+
+		if (!damageMode && this.damageMode) {
+			this.room.lights.forEach((light) => {
+				delete light.color;
+				delete light.intensity;
+			});
+		}
+
+		this.damageMode = damageMode;
 	}
 
 	public override spawn(map: GameMap): [Vec3, Vec3] | null {

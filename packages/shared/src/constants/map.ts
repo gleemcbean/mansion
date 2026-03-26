@@ -23,7 +23,7 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
 		.setTopology([0, 0], [5, 0], [5, 3], [4, 3], [4, 5], [0, 5])
 		.addDoorPoint(5, 1.5, CardinalDirection.West)
 		.addLight(4.5, 2, 2.5, { intensity: 3 })
-		.addSpawn(3, 4),
+		.addSpawn(2.25, 4),
 	new Room("corridor", "Corridor")
 		.setTopology([0, 0], [9, 0], [9, 3], [0, 3])
 		.addDoorPoint(0, 1.5, CardinalDirection.East)
@@ -32,14 +32,14 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
 		.addDoorPoint(9, 1.5, CardinalDirection.West)
 		.addDoorPoint(6.5, 3, CardinalDirection.North)
 		.addDoorPoint(2.5, 3, CardinalDirection.North)
-		.addLight(1.5, 1.6, 0.5, { intensity: 2, color: 0xC7001B })
-		.addLight(1.5, 1.6, 2.5, { intensity: 2, color: 0xC7001B })
-		.addLight(3.5, 1.6, 0.5, { intensity: 2, color: 0xC7001B })
-		.addLight(3.5, 1.6, 2.5, { intensity: 2, color: 0xC7001B })
-		.addLight(5.5, 1.6, 0.5, { intensity: 2, color: 0xC7001B })
-		.addLight(5.5, 1.6, 2.5, { intensity: 2, color: 0xC7001B })
-		.addLight(7.5, 1.6, 0.5, { intensity: 2, color: 0xC7001B })
-		.addLight(7.5, 1.6, 2.5, { intensity: 2, color: 0xC7001B }),
+		.addLight(1.5, 1.6, 0.5)
+		.addLight(1.5, 1.6, 2.5)
+		.addLight(3.5, 1.6, 0.5)
+		.addLight(3.5, 1.6, 2.5)
+		.addLight(5.5, 1.6, 0.5)
+		.addLight(5.5, 1.6, 2.5)
+		.addLight(7.5, 1.6, 0.5)
+		.addLight(7.5, 1.6, 2.5),
 	new Room("generator", "Generator")
 		.setTopology([0, 0], [5, 0], [5, 5], [3, 5], [3, 3], [2, 3], [2, 5], [0, 5])
 		.addDoorPoint(0, 1.5, CardinalDirection.East)

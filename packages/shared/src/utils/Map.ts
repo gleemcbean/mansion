@@ -334,7 +334,10 @@ export class PositionedRoom extends Room {
 	}
 
 	public intersects(other: PositionedRoom): boolean {
-		const pointRing: Vec2[] = [];
+		return this.boundaryPointsInside(other) || other.boundaryPointsInside(this);
+	}
+
+	private boundaryPointsInside(other: PositionedRoom): boolean {
 		const t_topology = this.t_topology;
 
 		for (let i = 0; i < t_topology.length; i++) {
@@ -346,12 +349,8 @@ export class PositionedRoom extends Room {
 				const t = d / distance;
 				const x = x1 + (x2 - x1) * t;
 				const y = y1 + (y2 - y1) * t;
-				pointRing.push([x, y]);
+				if (other.pointIn([x, y])) return true;
 			}
-		}
-
-		for (const point of pointRing) {
-			if (other.pointIn(point)) return true;
 		}
 
 		return false;

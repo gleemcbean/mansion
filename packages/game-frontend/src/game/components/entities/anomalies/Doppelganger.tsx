@@ -12,8 +12,6 @@ export default function Doppelganger({ data }: DoppelgangerProps) {
 	const { players } = useLobby();
 
 	const targetPlayer = useMemo(() => {
-		console.log(data);
-
 		const playersArray = Array.from(players.values());
 		const client = playersArray[
 			Math.floor(Math.random() * players.size)

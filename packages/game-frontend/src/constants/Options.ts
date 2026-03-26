@@ -29,6 +29,7 @@ export const DEFAULT_OPTIONS = {
 	crouch: ["ControlLeft", null],
 	light: ["KeyF", null],
 	interact: ["KeyE", null],
+	book: ["KeyQ", null],
 
 	// DEV
 	showHelper: false,
@@ -192,6 +193,11 @@ export const OPTIONS_COMPONENTS = Object.freeze({
 			id: "light",
 			type: OptionType.Keybind,
 			label: "Flashlight",
+		},
+		{
+			id: "book",
+			type: OptionType.Keybind,
+			label: "Open book",
 		},
 	],
 	[OptionCategory.Dev]: [

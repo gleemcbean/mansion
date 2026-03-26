@@ -1,10 +1,25 @@
+import { SYLLABLES } from "@/constants/anomalies";
 import type { Vec3 } from "@/types/util";
 import type { PlayerGameData } from "../types/player";
 import type { GameMap } from "./Map";
 
+function composeSyllables(): [string, string, string] {
+	const syllables: string[] = [];
+	const batch = [...SYLLABLES];
+
+	for (let i = 0; i < 3; i++) {
+		syllables.push(
+			batch.splice(Math.floor(Math.random() * batch.length), 1)[0]!,
+		);
+	}
+
+	return syllables as [string, string, string];
+}
+
 export default abstract class Anomaly {
 	public position: Vec3 = [0, 0, 0];
 	public rotation: Vec3 = [0, 0, 0];
+	public syllables: [string, string, string] = composeSyllables();
 
 	public static id: string;
 	public static name: string;
@@ -37,6 +52,7 @@ export default abstract class Anomaly {
 			description: this.description,
 			position: this.position,
 			rotation: this.rotation,
+			syllables: this.syllables,
 		};
 	}
 }

@@ -33,6 +33,7 @@ import usePlayer from "@/hooks/useClient";
 import useClient from "@/hooks/useClient";
 import useLobby from "@/hooks/useLobby";
 import useWebsocket from "@/hooks/useWebsocket";
+import Book from "../Book";
 import Selector from "./Selector";
 
 type KeyboardControlsProps = {
@@ -52,6 +53,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 	const lastSent = useRef(0);
 	const lastEnergyDrain = useRef(0);
 	const energy = useRef(100);
+	const wasCrouching = useRef(false);
 	const fovRef = useRef(PL_FOV);
 	const targetFovRef = useRef(PL_FOV);
 	const oldQuat = useRef(new THREE.Quaternion());
@@ -107,7 +109,17 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 			send(ClientPacketType.PlayerUpdate, { gameData: data });
 		};
 
-		const oldEnergy = energy.current;
+		const raycastScene = (
+			origin: THREE.Vector3,
+			dir: THREE.Vector3,
+			raycaster: THREE.Raycaster,
+		) => {
+			const candidates: THREE.Object3D[] = [];
+			scene.traverse((obj) => candidates.push(obj));
+			raycaster.set(origin, dir);
+			return raycaster.intersectObjects(candidates, true);
+		};
+
 		const keys = get();
 		const forward = Number(keys.forward);
 		const backward = Number(keys.backward);
@@ -123,54 +135,42 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 		const canLight =
 			lighting.value && energy.current > 0 && height > PL_CROUCH_HEIGHT + 0.2;
 
-		if (sprinting && !options.godMode) energy.current -= delta * 10;
-		if (lighting.value && !options.godMode) energy.current -= delta * 6;
+		const oldEnergy = energy.current;
+
+		if (!options.godMode) {
+			if (sprinting) energy.current -= delta * 10;
+			if (lighting.value) energy.current -= delta * 6;
+		}
 		energy.current = Math.max(0, energy.current);
 
 		if (energy.current !== oldEnergy) {
 			lastEnergyDrain.current = Date.now();
-		}
-
-		if (
-			energy.current === oldEnergy &&
-			lastEnergyDrain.current + 1000 < Date.now()
-		) {
+		} else if (lastEnergyDrain.current + 1000 < Date.now()) {
 			energy.current = Math.min(PL_MAX_STAMINA, energy.current + delta * 6);
 		}
 
 		if ((lightPressed && lighting.ready) || (lighting.value && !canLight)) {
 			setLighting((prev) => ({ value: !prev.value, ready: false }));
 		}
-
 		if (!lightPressed && !lighting.ready) {
 			setLighting((prev) => ({ ...prev, ready: true }));
 		}
 
-		const vel = body.current.linvel();
-		const yVel = vel?.y ?? 0;
+		const origin = camera.getWorldPosition(new THREE.Vector3());
+		const ceilHits = raycastScene(
+			origin,
+			new THREE.Vector3(0, 1, 0),
+			cRaycaster.current,
+		);
+		const canDecrouch = !ceilHits[0];
 
-		frontVector.set(0, 0, backward - forward);
-		sideVector.set(left - right, 0, 0);
-		direction.subVectors(frontVector, sideVector);
-
-		if (options.fly) {
-			direction.y = Number(keys.jump) - Number(keys.crouch);
+		if (crouch) {
+			wasCrouching.current = true;
+		} else if (canDecrouch) {
+			wasCrouching.current = false;
 		}
 
-		direction.normalize();
-		euler.set(0, camera.rotation.y, 0);
-		direction.applyEuler(euler);
-
-		const candidates: THREE.Object3D[] = [];
-		scene.traverse((obj) => candidates.push(obj));
-
-		let origin = camera.getWorldPosition(new THREE.Vector3());
-		let dir = new THREE.Vector3(0, 1, 0).normalize();
-		cRaycaster.current.set(origin, dir);
-		let hits = cRaycaster.current.intersectObjects(candidates, true);
-		const canDecrouch = !hits[0];
-
-		if (crouch || (!crouch && !canDecrouch)) {
+		if (wasCrouching.current) {
 			targetHeight.current = PL_CROUCH_HEIGHT;
 			targetThickness.current = PL_CROUCH_THICKNESS;
 		} else {
@@ -178,32 +178,40 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 			targetThickness.current = PL_THICKNESS;
 		}
 
-		const currentSpeed =
+		setHeight((prev) => prev + (targetHeight.current - prev) * delta * 5);
+		setThickness((prev) => prev + (targetThickness.current - prev) * delta * 5);
+
+		const { y: yVel } = body.current.linvel() ?? { y: 0 };
+
+		frontVector.set(0, 0, backward - forward);
+		sideVector.set(left - right, 0, 0);
+		direction.subVectors(frontVector, sideVector);
+
+		if (options.fly) direction.y = Number(keys.jump) - Number(keys.crouch);
+
+		direction.normalize();
+		euler.set(0, camera.rotation.y, 0);
+		direction.applyEuler(euler);
+
+		const speed =
 			PL_SPEED *
 			options.speed *
 			(sprinting ? PL_SPRINT_SPEED_MULTIPLIER : 1) *
 			(crouched ? PL_CROUCH_SPEED_MULTIPLIER : 1) *
 			(options.fly ? PL_FLY_SPEED_MULTIPLIER : 1);
 
-		direction.multiplyScalar(currentSpeed);
+		direction.multiplyScalar(speed);
 		body.current.setGravityScale(options.fly ? 0 : 1, false);
 
 		if (direction.lengthSq() > 0) {
 			body.current.wakeUp?.();
-
 			targetFovRef.current = sprinting ? PL_SPRINT_FOV : PL_FOV;
-
 			body.current.setLinvel(
-				{
-					x: direction.x,
-					y: options.fly ? direction.y : yVel,
-					z: direction.z,
-				},
+				{ x: direction.x, y: options.fly ? direction.y : yVel, z: direction.z },
 				true,
 			);
 		} else {
 			if (!sprinting) targetFovRef.current = PL_FOV;
-
 			body.current.setLinvel(
 				{
 					x: direction.x * 0.9,
@@ -214,25 +222,21 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 			);
 		}
 
-		origin = camera.getWorldPosition(new THREE.Vector3());
-		dir = new THREE.Vector3(0, -1, 0).normalize();
-		jRaycaster.current.set(origin, dir);
-		hits = jRaycaster.current.intersectObjects(candidates, true);
-		const grounded = !!hits[0];
+		const floorHits = raycastScene(
+			origin,
+			new THREE.Vector3(0, -1, 0),
+			jRaycaster.current,
+		);
+		const grounded = !!floorHits[0];
 
 		if (jump && !crouched && grounded && yVel < 0.25) {
-			currentPlayerVolume.current = Math.PI * thickness ** 2 * height;
-
-			const ratio = currentPlayerVolume.current / PL_VOLUME;
-
+			const vol = Math.PI * thickness ** 2 * height;
+			const ratio = vol / PL_VOLUME;
 			body.current.applyImpulse(
 				{ x: direction.x, y: PL_JUMP_FORCE * ratio, z: direction.z },
 				true,
 			);
 		}
-
-		setHeight((prev) => prev + (targetHeight.current - prev) * delta * 5);
-		setThickness((prev) => prev + (targetThickness.current - prev) * delta * 5);
 
 		const t = body.current.translation();
 		const q = camera.quaternion.clone();
@@ -247,13 +251,12 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 			const newGameData: PlayerGameData = {
 				position: [t.x, t.y, t.z],
 				quaternion: q,
-				crouched: crouched,
+				crouched,
 				running: sprint,
 				health: 100,
 				energy: energy.current,
 				lighting: lighting.value,
 			};
-
 			setGameData(newGameData);
 			sendPosPacket(newGameData);
 		}
@@ -317,11 +320,13 @@ export default function KeyboardControls({ spawn }: KeyboardControlsProps) {
 				{ name: "sprint", keys: keyify(options.sprint) },
 				{ name: "crouch", keys: keyify(options.crouch) },
 				{ name: "interact", keys: keyify(options.interact) },
+				{ name: "book", keys: keyify(options.book) },
 				{ name: "light", keys: keyify(options.light) },
 			]}
 		>
 			<KeyboardControlsLogic spawn={spawn} />
 			<Selector />
+			<Book />
 		</DREIKeyboardControls>
 	);
 }
