@@ -1,7 +1,7 @@
 import type Anomaly from "@/utils/Anomaly";
-import Doppelganger from "./entities/Doppelganger";
-import Phantom from "./entities/Phantom";
-import Tentacles from "./entities/Tentacles";
+import Doppelganger from "../../../game-server/src/assets/entities/Doppelganger";
+import Phantom from "../../../game-server/src/assets/entities/Phantom";
+import Tentacles from "../../../game-server/src/assets/entities/Tentacles";
 
 export const ANOMALIES = new Map<string, typeof Anomaly>([
 	["doppelganger", Doppelganger as typeof Anomaly],
