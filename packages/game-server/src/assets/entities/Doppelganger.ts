@@ -94,7 +94,6 @@ export default class Doppelganger extends Anomaly {
     const nearest = nearestPlayer(players, this.position, DETECTION_RADIUS);
     if (!nearest) return;
 
-    // Repath when target changes or path is exhausted
     if (nearest !== this.target || this.waypointIndex >= this.waypoints.length) {
       this.target = nearest;
 
