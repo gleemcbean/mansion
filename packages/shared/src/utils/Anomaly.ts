@@ -33,6 +33,8 @@ export default abstract class Anomaly {
 
 	public abstract spawn(map: GameMap): [Vec3, Vec3] | null;
 
+	public abstract canCastSpell(playerData: PlayerGameData): boolean;
+
 	public get id() {
 		return (this.constructor as typeof Anomaly).id;
 	}

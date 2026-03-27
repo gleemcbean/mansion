@@ -15,6 +15,8 @@ export type PlayerGameData = {
 	energy: number;
 	health: number;
 	lighting: boolean;
+	anomalySteps: Record<string, number>;
+	captured: string[];
 };
 
 export type PlayerData = {

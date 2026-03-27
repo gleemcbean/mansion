@@ -10,10 +10,14 @@ export default class Tentacles extends Anomaly {
 	public static override description =
 		"A sinister entity that lurks under the beds in the mansion, its tentacles reaching out to ensnare unsuspecting victims.\nKeep your distance from the beds to avoid its grasp.";
 
+	public override canCastSpell(_playerData: PlayerGameData): boolean {
+		return false;
+	}
+
 	public override update(
-		map: GameMap,
-		players: PlayerGameData[],
-		deltaTime: number,
+		_map: GameMap,
+		_players: PlayerGameData[],
+		_deltaTime: number,
 	): void {}
 
 	public override spawn(map: GameMap): [Vec3, Vec3] | null {

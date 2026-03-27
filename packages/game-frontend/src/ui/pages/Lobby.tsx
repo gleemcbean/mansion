@@ -128,7 +128,11 @@ function PlayerItem({
 				{!isMe && (
 					<React.Fragment>
 						<div className={styles.sliderBox}>
-							<button className={styles.decreaseButton} onClick={decrease}>
+							<button
+								type="button"
+								className={styles.decreaseButton}
+								onClick={decrease}
+							>
 								<FaCaretLeft size={20} />
 							</button>
 							<div className={styles.sliderContainer}>
@@ -146,11 +150,19 @@ function PlayerItem({
 									style={{ width: `${(volume / 2) * 100}%` }}
 								/>
 							</div>
-							<button className={styles.decreaseButton} onClick={increase}>
+							<button
+								type="button"
+								className={styles.decreaseButton}
+								onClick={increase}
+							>
 								<FaCaretRight size={20} />
 							</button>
 						</div>
-						<button className={styles.button} onClick={toggleMute}>
+						<button
+							type="button"
+							className={styles.button}
+							onClick={toggleMute}
+						>
 							{muted ? (
 								<IoMdVolumeOff size={20} />
 							) : (
@@ -160,6 +172,7 @@ function PlayerItem({
 						{iAmOwner && (
 							<React.Fragment>
 								<button
+									type="button"
 									className={styles.button}
 									onClick={() => setShowActions(!showActions)}
 									ref={buttonRef}
@@ -172,11 +185,16 @@ function PlayerItem({
 									}`}
 									ref={menuRef}
 								>
-									<button className={styles.action} onClick={promote}>
+									<button
+										type="button"
+										className={styles.action}
+										onClick={promote}
+									>
 										<RiVipCrownFill size={18} className={styles.actionIcon} />
 										<span className={styles.label}>Promote</span>
 									</button>
 									<button
+										type="button"
 										className={`${styles.action} ${styles.danger}`}
 										onClick={kick}
 									>
@@ -190,6 +208,7 @@ function PlayerItem({
 				)}
 				{isMe && (
 					<button
+						type="button"
 						className={styles.button}
 						onClick={() => setOption("muted", !options.muted)}
 					>
@@ -367,7 +386,11 @@ export default function Lobby({ back }: LobbyProps) {
 			<div className={styles.controls}>
 				<div className={styles.codeContainer}>
 					<h4>Game code</h4>
-					<button className={styles.codeButton} onClick={copyCode}>
+					<button
+						type="button"
+						className={styles.codeButton}
+						onClick={copyCode}
+					>
 						<span>{metadata!.code}</span>
 						{copied ? (
 							<FaCheck size={20} className={styles.check} />
@@ -379,18 +402,27 @@ export default function Lobby({ back }: LobbyProps) {
 				{metadata!.ownerUuid === client.uuid ? (
 					<React.Fragment>
 						<button
+							type="button"
 							className={styles.startButton}
 							disabled={players.size < LB_MIN_PLAYERS}
 							onClick={startGame}
 						>
 							Start Game
 						</button>
-						<button className={styles.backButton} onClick={closeLobby}>
+						<button
+							type="button"
+							className={styles.backButton}
+							onClick={closeLobby}
+						>
 							Close Lobby
 						</button>
 					</React.Fragment>
 				) : (
-					<button className={styles.backButton} onClick={closeLobby}>
+					<button
+						type="button"
+						className={styles.backButton}
+						onClick={closeLobby}
+					>
 						Leave Lobby
 					</button>
 				)}

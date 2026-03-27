@@ -84,10 +84,9 @@ export default function Options({ back }: OptionsProps) {
 			return prev;
 		});
 
-		timeout.current = setTimeout(
-			() => (hoverable.current = true),
-			SCROLL_DURATION,
-		);
+		timeout.current = setTimeout(() => {
+			hoverable.current = true;
+		}, SCROLL_DURATION);
 	};
 
 	return (

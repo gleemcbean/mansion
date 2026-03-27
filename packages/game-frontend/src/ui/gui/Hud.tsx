@@ -2,7 +2,7 @@ import {
 	PL_MAX_HEALTH,
 	PL_MAX_STAMINA,
 } from "@mansion/shared/constants/player";
-import { useProgress } from "@react-three/drei";
+// import { useProgress } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa";
 import { FaBoltLightning } from "react-icons/fa6";
@@ -13,8 +13,8 @@ import Minimap from "./Minimap";
 import Touch from "./Touch";
 
 export default function Hud() {
-	const { active, progress } = useProgress();
-	const { options, selectorTooltip, subGameData } = useClient();
+	// const { active, progress } = useProgress();
+	const { options, selectorTooltip, bookOpen, subGameData } = useClient();
 	const [gameData, setGameData] = useState({
 		health: PL_MAX_HEALTH,
 		energy: PL_MAX_STAMINA,
@@ -31,7 +31,7 @@ export default function Hud() {
 		return () => unsubscribe();
 	}, []);
 
-	if (!options.hud || active || progress < 100) return null;
+	if (!options.hud) return null;
 
 	return (
 		<div className={styles.container}>
@@ -64,18 +64,38 @@ export default function Hud() {
 				</p>
 			)}
 			<div className={styles.topTooltip}>
-				<p>
-					<Touch value={options.sprint[0]!} />
-					<span> Sprint</span>
-				</p>
-				<p>
-					<Touch value={options.crouch[0]!} />
-					<span> Hide</span>
-				</p>
+				{!bookOpen && (
+					<p>
+						<Touch value={options.sprint[0]!} />
+						<span> Sprint</span>
+					</p>
+				)}
+				{!bookOpen && (
+					<p>
+						<Touch value={options.crouch[0]!} />
+						<span> Hide</span>
+					</p>
+				)}
 				<p>
 					<Touch value={options.light[0]!} />
 					<span> Toggle flashlight</span>
 				</p>
+				<p>
+					<Touch value={options.book[0]!} />
+					<span> {bookOpen ? "Close" : "Open"} book</span>
+				</p>
+				{bookOpen && (
+					<p>
+						<Touch value={options.left[0]!} />
+						<span> Previous page</span>
+					</p>
+				)}
+				{bookOpen && (
+					<p>
+						<Touch value={options.right[0]!} />
+						<span> Next page</span>
+					</p>
+				)}
 			</div>
 		</div>
 	);

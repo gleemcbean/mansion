@@ -16,7 +16,7 @@ export default function PhysicsGate({ children }: PhysicsGateProps) {
 
 	useEffect(() => {
 		if (active || progress < 100) return;
-		const t = setTimeout(() => setReady(true), 100);
+		const t = setTimeout(() => setReady(true), 250);
 		return () => clearTimeout(t);
 	}, [active, progress]);
 

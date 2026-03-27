@@ -59,4 +59,9 @@ export default class Phantom extends Anomaly {
 
 		return [this.position, this.rotation];
 	}
+
+	public override canCastSpell(playerData: PlayerGameData): boolean {
+		if (!this.room) return false;
+		return this.room.pointIn(transform2dVec(playerData.position));
+	}
 }

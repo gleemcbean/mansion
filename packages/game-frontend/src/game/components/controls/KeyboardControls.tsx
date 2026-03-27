@@ -62,7 +62,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 	const cRaycaster = useRef(new THREE.Raycaster());
 
 	const { 1: get } = useKeyboardControls();
-	const { options, room, bookOpen, setRoom, setGameData } = useClient();
+	const { client, options, room, bookOpen, setRoom, setGameData } = useClient();
 	const { metadata } = useLobby();
 	const { send } = useWebsocket();
 
@@ -246,6 +246,8 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 			!lighting.ready ||
 			oldEnergy !== energy.current
 		) {
+			const oldGameData = client.playerData?.gameData;
+
 			const newGameData: PlayerGameData = {
 				position: [t.x, t.y, t.z],
 				quaternion: q,
@@ -254,7 +256,10 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 				health: 100,
 				energy: energy.current,
 				lighting: lighting.value,
+				anomalySteps: oldGameData?.anomalySteps ?? {},
+				captured: oldGameData?.captured ?? [],
 			};
+
 			setGameData(newGameData);
 			sendPosPacket(newGameData);
 		}

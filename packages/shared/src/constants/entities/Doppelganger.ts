@@ -10,10 +10,14 @@ export default class Doppelganger extends Anomaly {
 	public static override description =
 		"A mysterious entity that mimics the appearance of fungies within the mansion.\nCast your spell before it gets too close.";
 
+	public override canCastSpell(_playerData: PlayerGameData): boolean {
+		return false;
+	}
+
 	public override update(
-		map: GameMap,
-		players: PlayerGameData[],
-		deltaTime: number,
+		_map: GameMap,
+		_players: PlayerGameData[],
+		_deltaTime: number,
 	) {}
 
 	public override spawn(map: GameMap): [Vec3, Vec3] | null {

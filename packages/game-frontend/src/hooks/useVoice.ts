@@ -110,6 +110,7 @@ export default function useVoice() {
 		if (peers.current.has(uuid) || uuid <= client.uuid) return;
 
 		const pc = await createPeer(uuid);
+		if (pc.signalingState === "closed") return;
 		const offer = await pc.createOffer();
 		await pc.setLocalDescription(offer);
 
@@ -167,9 +168,7 @@ export default function useVoice() {
 	};
 
 	const getPlayerVolume = useCallback(
-		(uuid: UUID) => {
-			return volumes.get(uuid) ?? 1;
-		},
+		(uuid: UUID) => volumes.get(uuid) ?? 1,
 		[volumes],
 	);
 
@@ -261,6 +260,7 @@ export default function useVoice() {
 
 	useEffect(() => {
 		if (!localStream.current) return;
+		let cancelled = false;
 
 		const pc = new RTCPeerConnection(ICE_CONFIG);
 
@@ -270,6 +270,7 @@ export default function useVoice() {
 
 		(async () => {
 			const offer = await pc.createOffer();
+			if (cancelled) return;
 			await pc.setLocalDescription(offer);
 
 			if (!pc.localDescription) return;
@@ -286,6 +287,7 @@ export default function useVoice() {
 				}),
 			});
 
+			if (cancelled) return;
 			const answer = await res.json();
 
 			await pc.setRemoteDescription(
@@ -297,6 +299,7 @@ export default function useVoice() {
 		})();
 
 		return () => {
+			cancelled = true;
 			pc.close();
 		};
 	}, [localStream.current]);

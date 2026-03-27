@@ -18,7 +18,7 @@ import type { WSClient } from "@/ws/types";
 export class Lobby {
 	public metadata: LobbyMetadata;
 	private players: Map<UUID, WSClient> = new Map();
-	private anomalies: Anomaly[] = [];
+	public anomalies: Anomaly[] = [];
 	public updateLoop: NodeJS.Timeout | null = null;
 
 	public constructor(owner: WSClient) {
@@ -88,6 +88,7 @@ export class Lobby {
 	public removePlayer(uuid: UUID) {
 		const player = this.players.get(uuid);
 		if (!player) return;
+
 		this.players.delete(uuid);
 
 		player.ws.data.lobby = undefined;
@@ -172,8 +173,9 @@ export class Lobby {
 
 		playersArray.forEach((p, i) => {
 			const [sx, sy] = spawns[i] ?? [0, 0];
+			if (!p.playerData) return;
 
-			p.playerData!.gameData = {
+			p.playerData.gameData = {
 				position: [sx, 1, sy],
 				quaternion: [0, 0, 0, 1],
 				crouched: false,
@@ -181,12 +183,14 @@ export class Lobby {
 				energy: 100,
 				health: 100,
 				lighting: false,
+				anomalySteps: Object.fromEntries(this.anomalies.map((a) => [a.id, 0])),
+				captured: [],
 			};
 
 			p.ws.send(
 				Packet.create(ServerPacketType.GameStarted, {
 					metadata: this.metadata,
-					gameData: p.playerData!.gameData,
+					gameData: p.playerData.gameData,
 					anomalies: this.anomalies.map((a) => a.toJSON()),
 				}),
 			);

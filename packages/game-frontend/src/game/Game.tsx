@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { DEFAULT_OPTIONS, type Options } from "@/constants/Options";
 import useClient from "@/hooks/useClient";
 import useLobby from "@/hooks/useLobby";
+import useVoice from "@/hooks/useVoice";
 import type { ModalRef } from "@/ui/components/Modal";
 import Hud from "@/ui/gui/Hud";
 import Loading from "@/ui/modals/Loading";

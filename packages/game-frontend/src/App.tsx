@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import Game from "./game/Game";
 import useClient from "./hooks/useClient";
 import useLobby from "./hooks/useLobby";
+import useVoice from "./hooks/useVoice";
 import useWebsocket from "./hooks/useWebsocket";
 import Loading from "./ui/modals/Loading";
 import Router from "./ui/Router";
@@ -29,6 +30,10 @@ export default function App() {
 
 		return value ? decodeURIComponent(value) : null;
 	}
+
+	// const { streams } = useVoice();
+
+	// console.log(streams);
 
 	useEffect(() => {
 		const unsubscribes = [
