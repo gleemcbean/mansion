@@ -1,7 +1,8 @@
-import { SYLLABLES } from "@/constants/anomalies";
-import type { Vec3 } from "@/types/util";
-import type { PlayerGameData } from "../types/player";
-import type { GameMap } from "./Map";
+import SYLLABLES from "@mansion/shared/constants/syllables";
+import type { Vec3 } from "@mansion/shared/types/util";
+import type { WSClient, WSData } from "@/ws/types";
+import type { PlayerGameData } from "../../../shared/src/types/player";
+import type { GameMap } from "../../../shared/src/utils/Map";
 
 function composeSyllables(): [string, string, string] {
 	const syllables: string[] = [];
@@ -26,8 +27,9 @@ export default abstract class Anomaly {
 	public static description: string;
 
 	public abstract update(
+		ws: Bun.ServerWebSocket<WSData>,
 		map: GameMap,
-		players: PlayerGameData[],
+		players: WSClient[],
 		deltaTime: number,
 	): void;
 
@@ -47,6 +49,10 @@ export default abstract class Anomaly {
 		return (this.constructor as typeof Anomaly).description;
 	}
 
+	public get entityData(): Record<string, any> {
+		return {};
+	}
+
 	public toJSON() {
 		return {
 			id: this.id,
@@ -55,6 +61,7 @@ export default abstract class Anomaly {
 			position: this.position,
 			rotation: this.rotation,
 			syllables: this.syllables,
+			entity_data: this.entityData,
 		};
 	}
 }

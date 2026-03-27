@@ -1,6 +1,6 @@
 import type * as THREE from "three";
 import type { Door, DoorPoint, Light } from "../types/map";
-import type { CardinalDirection, Vec2, Vec3 } from "../types/util";
+import type { CardinalDirection, UUID, Vec2, Vec3 } from "../types/util";
 
 type TranslateReturn<T> = T extends undefined
 	? Vec2
@@ -67,8 +67,12 @@ export class GameMap {
 		return null;
 	}
 
-	public getDoor(doorId: number): Door | null {
-		return this.doors.find((d) => d.id === doorId) ?? null;
+	public getDoor(doorUuid: UUID): Door | null {
+		return this.doors.find((d) => d.uuid === doorUuid) ?? null;
+	}
+
+	public getRoom(roomUuid: UUID): PositionedRoom | null {
+		return this.rooms.find((d) => d.uuid === roomUuid) ?? null;
 	}
 
 	public bounds(): { min: Vec2; max: Vec2 } {
@@ -96,6 +100,7 @@ export class GameMap {
 
 export class Room {
 	public doorPoints: DoorPoint[] = [];
+	public doorUUIDs: UUID[] = [];
 	public topology: Vec2[] = [];
 	public spawns: Vec2[] = [];
 	public lights: Light[] = [];
@@ -212,6 +217,7 @@ export class Room {
 }
 
 export class PositionedRoom extends Room {
+	public uuid: UUID;
 	public position: Vec2;
 	public direction: CardinalDirection;
 	public anomalies: string[] = [];
@@ -230,7 +236,7 @@ export class PositionedRoom extends Room {
 
 	public static override fromJSON(obj: Object): PositionedRoom {
 		try {
-			const room = new PositionedRoom(new Room("", ""));
+			const room = new PositionedRoom(new Room("", ""), "0-0-0-0-0-0");
 			Object.assign(room, obj);
 			return room;
 		} catch {
@@ -240,12 +246,14 @@ export class PositionedRoom extends Room {
 
 	public constructor(
 		room: Room,
+		uuid: UUID,
 		position: Vec2 = [0, 0],
 		direction: CardinalDirection = Math.floor(
 			Math.random() * 4,
 		) as CardinalDirection,
 	) {
 		super(room.id, room.name, room.multiplicity);
+		this.uuid = uuid;
 		this.topology = [...room.topology];
 		this.spawns = [...room.spawns];
 		this.doorPoints = [...room.doorPoints];

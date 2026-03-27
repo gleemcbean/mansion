@@ -1,5 +1,5 @@
 import type * as THREE from "three";
-import type { CardinalDirection, Vec2, Vec3 } from "./util";
+import type { CardinalDirection, UUID, Vec2, Vec3 } from "./util";
 
 export type DoorPoint = {
 	position: Vec2;
@@ -7,7 +7,7 @@ export type DoorPoint = {
 };
 
 export type Door = {
-	id: number;
+	uuid: UUID;
 	position: Vec2;
 	direction: CardinalDirection;
 	openable: boolean;

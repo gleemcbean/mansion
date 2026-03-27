@@ -14,5 +14,5 @@ export default new EventHandler(ClientPacketType.StartGame, (ws) => {
 	)
 		return;
 
-	lobby.start();
+	lobby.start(ws);
 });

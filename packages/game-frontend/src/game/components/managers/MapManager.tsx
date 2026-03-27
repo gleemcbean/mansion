@@ -17,11 +17,11 @@ export default function RoomManager() {
 					<meshBasicMaterial color="white" transparent />
 				</mesh>
 			</RigidBody>
-			{map.rooms.map((room, i) => (
-				<Room key={`${i}${room.id}`} data={room} />
+			{map.rooms.map((room) => (
+				<Room key={room.uuid} data={room} />
 			))}
 			{map.doors.map((door) => (
-				<Door key={door.position.toString()} data={door} />
+				<Door key={door.uuid} data={door} />
 			))}
 		</React.Fragment>
 	);

@@ -1,12 +1,12 @@
 import path from "node:path";
-import { ANOMALIES } from "@mansion/shared/constants/anomalies";
-import type AnomalyType from "@mansion/shared/utils/Anomaly";
 import {
 	type CanvasRenderingContext2D,
 	createCanvas,
 	loadImage,
 	registerFont,
 } from "canvas";
+import type AnomalyType from "@/utils/Anomaly";
+import { ANOMALIES } from "@/utils/anomalies";
 
 const BOOK_WIDTH = 438;
 const BOOK_HEIGHT = 612;
@@ -84,9 +84,8 @@ export default async function bookPageController(req: Request) {
 				});
 			}
 
-			const Anomaly: typeof AnomalyType | null = ANOMALIES.get(
-				pageContent.anomaly,
-			);
+			const Anomaly: typeof AnomalyType | null =
+				ANOMALIES.get(pageContent.anomaly) ?? null;
 
 			if (!Anomaly) {
 				return new Response("Bad Request: Invalid anomaly type", {

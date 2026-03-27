@@ -1,4 +1,3 @@
-import { ANOMALIES } from "@mansion/shared/constants/anomalies";
 import {
 	LB_MAX_PLAYERS,
 	LB_MIN_PLAYERS,
@@ -10,10 +9,11 @@ import {
 	PlayerMushroomCapColor,
 } from "@mansion/shared/types/player";
 import type { UUID } from "@mansion/shared/types/util";
-import type Anomaly from "@mansion/shared/utils/Anomaly";
 import Packet from "@mansion/shared/utils/Packet";
+import type Anomaly from "@/utils/Anomaly";
+import { ANOMALIES } from "@/utils/anomalies";
 import Generators from "@/utils/Generators";
-import type { WSClient } from "@/ws/types";
+import type { WSClient, WSData } from "@/ws/types";
 
 export class Lobby {
 	public metadata: LobbyMetadata;
@@ -134,7 +134,7 @@ export class Lobby {
 		});
 	}
 
-	public start() {
+	public start(ws: Bun.ServerWebSocket<WSData>) {
 		if (
 			this.players.size < LB_MIN_PLAYERS ||
 			this.metadata.state !== LobbyState.Waiting
@@ -160,13 +160,12 @@ export class Lobby {
 		this.updateLoop = setInterval(() => {
 			this.anomalies.forEach((anomaly) => {
 				anomaly.update(
+					ws,
 					this.metadata.map!,
-					this.players
-						.values()
-						.toArray()
-						.map((wsClient) => wsClient.playerData!.gameData!),
+					this.players.values().toArray(),
 					Date.now() - lastUpdate,
 				);
+
 				lastUpdate = Date.now();
 			});
 		}, 1000 / 20);

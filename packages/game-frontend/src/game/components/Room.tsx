@@ -8,6 +8,19 @@ type RoomProps = {
 	data: PositionedRoom;
 };
 
+// function makeAnimation(...steps: [() => void, number][]) {
+// 	const timeouts = [];
+// 	let time = 0;
+
+// 	for (let i = 0; i < steps.length; i++) {
+// 		const [callback, ms] = steps[i]!;
+// 		time += ms;
+// 		timeouts.push(setTimeout(callback, time));
+// 	}
+
+// 	return timeouts;
+// }
+
 export default function Room({ data }: RoomProps) {
 	const groupRef = useRef<THREE.Group>(null);
 

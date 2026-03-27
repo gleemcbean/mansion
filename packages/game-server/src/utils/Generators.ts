@@ -5,7 +5,7 @@ import {
 	ROOMS,
 } from "@mansion/shared/constants/map";
 import type { Door } from "@mansion/shared/types/map";
-import type { Vec2 } from "@mansion/shared/types/util";
+import type { UUID, Vec2 } from "@mansion/shared/types/util";
 import { GameMap, PositionedRoom, type Room } from "@mansion/shared/utils/Map";
 import { lobbies } from "@/services/lobby";
 
@@ -64,7 +64,7 @@ export default class Generators {
 				}
 
 				const door: Door = {
-					id: map.doorCount + 1,
+					uuid: Bun.randomUUIDv7() as UUID,
 					position: doorPoint.position,
 					direction: doorPoint.direction,
 					openable: false,
@@ -72,6 +72,7 @@ export default class Generators {
 				};
 
 				map.doors.push(door);
+				room.doorUUIDs.push(door.uuid);
 				if (map.rooms.length >= M_MAX_ROOMS) return;
 
 				let positioned: PositionedRoom | null = null;
@@ -102,6 +103,7 @@ export default class Generators {
 						const pos = [dx - cdx, dy - cdy] as Vec2;
 						const positionedCandidate = new PositionedRoom(
 							candidate,
+							Bun.randomUUIDv7() as UUID,
 							pos,
 							facing,
 						);
@@ -131,7 +133,10 @@ export default class Generators {
 		};
 
 		return populate(
-			new PositionedRoom(available.find((r) => r.id === "corridor") as Room),
+			new PositionedRoom(
+				available.find((r) => r.id === "corridor") as Room,
+				Bun.randomUUIDv7() as UUID,
+			),
 		);
 	}
 }

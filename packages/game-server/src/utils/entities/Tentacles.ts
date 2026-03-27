@@ -1,7 +1,8 @@
-import type { PlayerGameData } from "@/types/player";
-import { CardinalDirection, type Vec3 } from "@/types/util";
+import type { PlayerGameData } from "@mansion/shared/types/player";
+import { CardinalDirection, type Vec3 } from "@mansion/shared/types/util";
+import type { GameMap } from "@mansion/shared/utils/Map";
 import Anomaly from "@/utils/Anomaly";
-import type { GameMap } from "@/utils/Map";
+import type { WSClient, WSData } from "@/ws/types";
 
 export default class Tentacles extends Anomaly {
 	public static override id = "tentacles";
@@ -15,8 +16,9 @@ export default class Tentacles extends Anomaly {
 	}
 
 	public override update(
+		_ws: Bun.ServerWebSocket<WSData>,
 		_map: GameMap,
-		_players: PlayerGameData[],
+		_players: WSClient[],
 		_deltaTime: number,
 	): void {}
 
