@@ -17,14 +17,47 @@ function composeSyllables(): [string, string, string] {
 	return syllables as [string, string, string];
 }
 
+export type AnomalyState = "roam" | "follow" | "attack";
+
 export default abstract class Anomaly {
 	public position: Vec3 = [0, 0, 0];
 	public rotation: Vec3 = [0, 0, 0];
+	public state: AnomalyState = "roam";
 	public syllables: [string, string, string] = composeSyllables();
 
 	public static id: string;
 	public static name: string;
 	public static description: string;
+
+	public abstract shouldFollow(players: PlayerGameData[]): boolean;
+	public abstract shouldAttack(players: PlayerGameData[]): boolean;
+	public abstract shouldRoam(players: PlayerGameData[]): boolean;
+
+	public updateState(players: PlayerGameData[]): void {
+		switch (this.state) {
+		case "roam":
+			if (this.shouldFollow(players)) this.setState("follow");
+			break;
+		case "follow":
+			if (this.shouldAttack(players)) this.setState("attack");
+			else if (this.shouldRoam(players)) this.setState("roam");
+			break;
+		case "attack":
+			if (this.shouldRoam(players)) this.setState("roam");
+			else if (this.shouldFollow(players)) this.setState("follow");
+			break;
+		}
+	}
+
+	public setState(next: AnomalyState): void {
+		if (this.state === next) return;
+		this.onStateExit(this.state);
+		this.state = next;
+		this.onStateEnter(next);
+	}
+
+	public onStateEnter(_state: AnomalyState): void {}
+	public onStateExit(_state: AnomalyState): void {}
 
 	public abstract update(
 		ws: Bun.ServerWebSocket<WSData>,
