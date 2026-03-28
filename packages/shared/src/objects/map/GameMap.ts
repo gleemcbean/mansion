@@ -6,6 +6,7 @@ import PositionedRoom from "./PositionedRoom";
 
 export default class GameMap {
 	public usedSpawns: Vec2[] = [];
+	private grid: boolean[][] | null = null;
 
 	public static fromJSON(obj: Object): GameMap {
 		try {
@@ -94,6 +95,8 @@ export default class GameMap {
 	}
 
 	public toGrid(): boolean[][] {
+		if (this.grid) return this.grid;
+
 		const {
 			min: [minX, minY],
 			width,
@@ -119,10 +122,12 @@ export default class GameMap {
 			for (let gy = 0; gy < roomGrid.length; gy++) {
 				const row = roomGrid[gy];
 				if (!row) continue;
+
 				for (let gx = 0; gx < row.length; gx++) {
 					if (!row[gx]) continue;
 					const globalY = offsetY + gy;
 					const globalX = offsetX + gx;
+
 					if (
 						globalY >= 0 &&
 						globalY < rows &&
@@ -135,11 +140,26 @@ export default class GameMap {
 			}
 		}
 
+		this.grid = grid;
 		return grid;
 	}
 
 	public randomPoint(): Vec2 {
-		const room = this.rooms[Math.floor(Math.random() * this.rooms.length)]!;
-		return room.t_randomPoint();
+		const bounds = this.bounds;
+		const grid = this.toGrid();
+		const coords: Vec2[] = [];
+
+		for (let y = 0; y < bounds.height / M_GRID_SIZE; y++) {
+			for (let x = 0; x < bounds.width / M_GRID_SIZE; x++) {
+				if (!grid[y]?.[x]) continue;
+
+				coords.push([
+					x * M_GRID_SIZE + this.bounds.min[0],
+					y * M_GRID_SIZE + this.bounds.min[1],
+				]);
+			}
+		}
+
+		return coords[Math.floor(Math.random() * coords.length)]!;
 	}
 }

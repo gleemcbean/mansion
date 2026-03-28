@@ -233,7 +233,7 @@ export default function Lobby({ back }: LobbyProps) {
 		fillPlayers,
 		addPlayer,
 		removePlayer,
-		setAnomalies,
+		fillAnomalies,
 	} = useLobby();
 	const {
 		isPlayerMuted,
@@ -328,7 +328,7 @@ export default function Lobby({ back }: LobbyProps) {
 				ServerPacketType.GameStarted,
 				({ metadata, gameData, anomalies }) => {
 					setMetadata(metadata);
-					setAnomalies(anomalies);
+					fillAnomalies(anomalies);
 					client.playerData!.gameData = gameData;
 				},
 			),

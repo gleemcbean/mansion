@@ -13,17 +13,22 @@ export enum AnomalyState {
 export default abstract class Anomaly {
 	public position: Vec3 = [0, 0, 0];
 	public rotation: Vec3 = [0, 0, 0];
-	public state: AnomalyState = AnomalyState.Roam;
 	public syllables: [string, string, string] = composeSyllables();
+	public paused: boolean = true;
+	protected state: AnomalyState = AnomalyState.Roam;
+	protected timeouts: NodeJS.Timeout[] = [];
 
 	public static id: string;
 	public static name: string;
 	public static description: string;
 
-	public constructor(protected ws: Bun.ServerWebSocket<WSData>) {}
+	public constructor(
+		protected ws: Bun.ServerWebSocket<WSData>,
+		protected map: GameMap,
+	) {}
 
 	public abstract update(players: WSClient[], deltaTime: number): void;
-	public abstract spawn(map: GameMap): [Vec3, Vec3] | null;
+	public abstract spawn(): [Vec3, Vec3] | null;
 	public abstract canCastSpell(playerData: PlayerGameData): boolean;
 
 	public get id() {
@@ -40,6 +45,14 @@ export default abstract class Anomaly {
 
 	public get entityData(): Record<string, any> {
 		return {};
+	}
+
+	public kill() {
+		this.timeouts.forEach((t) => {
+			clearTimeout(t);
+		});
+
+		this.timeouts = [];
 	}
 
 	public toJSON() {

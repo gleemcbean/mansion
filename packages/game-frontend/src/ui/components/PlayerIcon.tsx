@@ -1,13 +1,13 @@
 type PlayerIconProps = {
 	color: string;
-	owner: boolean;
+	owner?: boolean;
 	className?: string;
 };
 
 export default function PlayerIcon({
 	color,
 	className,
-	owner,
+	owner = false,
 }: PlayerIconProps) {
 	return (
 		<svg

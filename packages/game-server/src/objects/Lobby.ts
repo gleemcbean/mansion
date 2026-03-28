@@ -148,9 +148,18 @@ export default class Lobby {
 		const spawns = playersArray.map(() => this.metadata.map!.randomSpawn());
 
 		ANOMALIES.forEach((Anomaly) => {
-			const anomaly = new Anomaly(ws);
-			const anomalySpawn = anomaly.spawn(this.metadata.map!);
+			const anomaly = new Anomaly(ws, this.metadata.map!);
+			const anomalySpawn = anomaly.spawn();
 			if (anomalySpawn) this.anomalies.push(anomaly);
+		});
+
+		this.anomalies.forEach((a) => {
+			setTimeout(
+				() => {
+					a.paused = false;
+				},
+				Math.random() * 2000 + 1000,
+			);
 		});
 
 		if (this.updateLoop) clearTimeout(this.updateLoop);
@@ -199,6 +208,10 @@ export default class Lobby {
 			p.ws.data.lobby = undefined;
 			p.ws.unsubscribe(this.metadata.code);
 			p.ws.send(Packet.create(ServerPacketType.GameClosed));
+		});
+
+		this.anomalies.forEach((a) => {
+			a.kill();
 		});
 
 		if (this.updateLoop) {

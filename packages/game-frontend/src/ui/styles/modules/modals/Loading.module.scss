@@ -1,0 +1,15 @@
+@use "../../variables.scss" as variables;
+
+.container{
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  .text {
+    color: variables.$text-secondary-color;
+  }
+}

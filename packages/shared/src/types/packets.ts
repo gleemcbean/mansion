@@ -81,7 +81,7 @@ export type ServerPacketMap = {
 	[ServerPacketType.Kicked]: {};
 	[ServerPacketType.GameStarted]: { metadata: LobbyMetadata; gameData: PlayerGameData, anomalies: Anomaly[] };
 	[ServerPacketType.PlayerUpdate]: { uuid: UUID; client: Client };
-	[ServerPacketType.AnomalyUpdate]: { anomalyId: string, data: Omit<Anomaly, 'id'> };
+	[ServerPacketType.AnomalyUpdate]: { anomalyId: string, data: Anomaly };
 	[ServerPacketType.DoorToggle]: { doorUuid: UUID, isOpen: boolean };
 	[ServerPacketType.RoomUpdate]: { roomUuid: UUID };
 	[ServerPacketType.RTCSignalOffer]: { from: UUID; sdp: string };

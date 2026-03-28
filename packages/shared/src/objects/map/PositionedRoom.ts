@@ -256,8 +256,4 @@ export default class PositionedRoom extends Room {
 
 		return grid;
 	}
-
-	public t_randomPoint(): Vec2 {
-		return this.translate(this.randomPoint()) as Vec2;
-	}
 }

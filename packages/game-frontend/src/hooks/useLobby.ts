@@ -1,3 +1,4 @@
+import type { Anomaly } from "@mansion/shared/types/anomalies";
 import type { Client } from "@mansion/shared/types/player";
 import type { UUID } from "@mansion/shared/types/util";
 import { useAtom } from "jotai";
@@ -34,6 +35,12 @@ export default function useLobby() {
 		setPlayers(next);
 	};
 
+	const fillAnomalies = (list: Anomaly[]) => {
+		const next = new Map<string, Anomaly>();
+		for (const a of list) next.set(a.id, a);
+		setAnomalies(next);
+	};
+
 	return {
 		metadata,
 		opened: !!metadata,
@@ -43,6 +50,6 @@ export default function useLobby() {
 		addPlayer,
 		removePlayer,
 		fillPlayers,
-		setAnomalies,
+		fillAnomalies,
 	};
 }

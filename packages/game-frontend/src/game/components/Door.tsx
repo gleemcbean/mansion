@@ -114,7 +114,6 @@ export default function Door({ data }: DoorProps) {
 		const unsubscribe = addHandler(
 			ServerPacketType.DoorToggle,
 			({ doorUuid, isOpen }) => {
-				console.log(doorUuid);
 				if (doorUuid !== data.uuid) return;
 				setDoorState(isOpen);
 			},

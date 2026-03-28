@@ -2,9 +2,9 @@ import type * as THREE from "three";
 import type { DoorPoint, Light } from "@/types/map";
 import type { CardinalDirection, UUID, Vec2, Vec3 } from "@/types/util";
 import { M_GRID_SIZE } from "../../constants/map";
-import Polygon from "./Polygon";
 
-export default class Room extends Polygon {
+export default class Room {
+	public topology: Vec2[] = [];
 	public doorPoints: DoorPoint[] = [];
 	public doorUUIDs: UUID[] = [];
 	public spawns: Vec2[] = [];
@@ -24,9 +24,7 @@ export default class Room extends Polygon {
 		public id: string,
 		public name: string,
 		public multiplicity: number = 1,
-	) {
-		super();
-	}
+	) {}
 
 	public setTopology(...topology: Vec2[]): this {
 		this.topology = topology;
@@ -109,9 +107,38 @@ export default class Room extends Polygon {
 		return this.doorPoints.length === 1;
 	}
 
+	public get area(): number {
+		let area = 0;
+		const n = this.topology.length;
+
+		for (let i = 0; i < n; i++) {
+			const [x1, y1] = this.topology[i] as Vec2;
+			const [x2, y2] = this.topology[(i + 1) % n] as Vec2;
+			area += x1 * y2 - x2 * y1;
+		}
+
+		return Math.abs(area) / 2;
+	}
+
+	public pointIn([x, y]: Vec2): boolean {
+		let inside = false;
+		const n = this.topology.length;
+
+		for (let i = 0, j = n - 1; i < n; j = i++) {
+			const [xi, yi] = this.topology[i] as Vec2;
+			const [xj, yj] = this.topology[j] as Vec2;
+			const intersect =
+				yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+
+			if (intersect) inside = !inside;
+		}
+
+		return inside;
+	}
+
 	public toGrid() {
 		const roomPathfindingData = require(
-			`../constants/pathfinding/${this.id}.json`,
+			`../../constants/pathfinding/${this.id}.json`,
 		);
 
 		const newGrid = roomPathfindingData.grid.map((row: boolean[], y: number) =>

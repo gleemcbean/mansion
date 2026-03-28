@@ -82,7 +82,7 @@ export default function Book() {
 			const leftAction = actions.NlaTrack2;
 			const rightAction = actions["NlaTrack.3"];
 
-			if (leftAction && leftPage && page.current < anomalies.length / 2 - 1) {
+			if (leftAction && leftPage && page.current < anomalies.size / 2 - 1) {
 				leftAction.play();
 				leftAction.time = 1.8;
 				leftAction.timeScale = 2;
@@ -204,7 +204,7 @@ export default function Book() {
 		}
 
 		for (let i = 0; i < 2; i++) {
-			const anomaly = anomalies[page.current * 2 + i];
+			const anomaly = Array.from(anomalies.values())[page.current * 2 + i];
 			const url = new URL(
 				`${import.meta.env.VITE_HTTP_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/book-page`,
 			);

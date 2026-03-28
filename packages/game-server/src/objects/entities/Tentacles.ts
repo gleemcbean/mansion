@@ -1,4 +1,3 @@
-import type GameMap from "@mansion/shared/objects/map/GameMap";
 import type { PlayerGameData } from "@mansion/shared/types/player";
 import { CardinalDirection, type Vec3 } from "@mansion/shared/types/util";
 import Anomaly from "@/objects/Anomaly";
@@ -15,10 +14,12 @@ export default class Tentacles extends Anomaly {
 		return false;
 	}
 
-	public override update(_players: WSClient[], _deltaTime: number): void {}
+	public override update(_players: WSClient[], _deltaTime: number): void {
+		if (this.paused) return;
+	}
 
-	public override spawn(map: GameMap): [Vec3, Vec3] | null {
-		const bedrooms = map.rooms.filter(
+	public override spawn(): [Vec3, Vec3] | null {
+		const bedrooms = this.map.rooms.filter(
 			(r) =>
 				r.id.startsWith("bedroom") &&
 				!r.anomalies.includes((this.constructor as typeof Anomaly).id),

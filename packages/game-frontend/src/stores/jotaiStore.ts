@@ -15,7 +15,7 @@ export type PacketSet = Set<PacketCallback>;
 
 export const lobbyMetadataAtom = atom<LobbyMetadata | null>(null);
 export const playersAtom = atom<Map<UUID, Client>>(new Map());
-export const anomaliesAtom = atom<Anomaly[]>([]);
+export const anomaliesAtom = atom<Map<string, Anomaly>>(new Map());
 
 export const localStreamAtom = atom<MediaStream | null>(null);
 export const playerRTCsAtom = atom<Map<UUID, RTCPeerConnection>>(new Map());

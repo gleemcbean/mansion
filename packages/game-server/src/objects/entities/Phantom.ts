@@ -1,4 +1,3 @@
-import type GameMap from "@mansion/shared/objects/map/GameMap";
 import type PositionedRoom from "@mansion/shared/objects/map/PositionedRoom";
 import Packet from "@mansion/shared/objects/Packet";
 import { ServerPacketType } from "@mansion/shared/types/packets";
@@ -21,13 +20,12 @@ export default class Phantom extends Anomaly {
 	private room: PositionedRoom | null = null;
 	private presence = false;
 	private phase: PhantomPhases = PhantomPhases.Idle;
-	private timeouts: NodeJS.Timeout[] = [];
 
 	public static override description =
 		"A ghostly entity that haunts the corridors of the mansion, instilling fear in those who cross its path.\nStay out of the red lights to avoid its wrath.";
 
 	public override update(players: WSClient[], _deltaTime: number): void {
-		if (!this.room) return;
+		if (this.paused || !this.room) return;
 
 		let presence = false;
 
@@ -44,15 +42,12 @@ export default class Phantom extends Anomaly {
 
 		if (this.presence !== presence) {
 			if (presence) {
-				console.log(this.room.doorUUIDs);
-
 				this.phase = PhantomPhases.Warning;
 
 				this.timeouts.push(
 					setTimeout(() => {
 						this.room!.doorUUIDs.forEach((doorUuid) => {
-							this.ws.publish(
-								this.ws.data.lobby!,
+							this.ws.send(
 								Packet.create(ServerPacketType.DoorToggle, {
 									doorUuid,
 									isOpen: false,
@@ -91,8 +86,8 @@ export default class Phantom extends Anomaly {
 		this.presence = presence;
 	}
 
-	public override spawn(map: GameMap): [Vec3, Vec3] | null {
-		const corridors = map.rooms.filter((r) => r.id === "corridor");
+	public override spawn(): [Vec3, Vec3] | null {
+		const corridors = this.map.rooms.filter((r) => r.id === "corridor");
 		const corridor = corridors[Math.floor(Math.random() * corridors.length)]!;
 
 		this.position = [corridor.position[0], 0, corridor.position[1]];

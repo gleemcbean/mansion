@@ -5,7 +5,7 @@ export type Anomaly = {
 	name: string;
 	description: string;
 	position: Vec3;
-	rotation: Quat;
+	rotation: Vec3;
 	syllables: [string, string, string];
 	entity_data: Record<string, any>;
 };

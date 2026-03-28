@@ -38,7 +38,7 @@ export default function App() {
 	useEffect(() => {
 		const unsubscribes = [
 			addHandler(ServerPacketType.Initialize, (client) => {
-				setClient(client);
+				setTimeout(setClient, 1000, client);
 
 				const code = getAndDeleteCookie("code");
 

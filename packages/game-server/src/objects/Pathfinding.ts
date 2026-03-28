@@ -14,7 +14,7 @@ export default class Pathfinding {
 		gridData: Grid,
 		speed: number,
 		dt: number,
-	): Vec2 {
+	): { pos: Vec2; rotationY: number } {
 		const [lx, lz] = this.lastGoal;
 		const [hx, hz] = goalPos;
 		const dx = hx - lx;
@@ -29,7 +29,7 @@ export default class Pathfinding {
 		}
 
 		if (!this.path || this.waypointIdx >= this.path.waypoints.length)
-			return botPos;
+			return { pos: botPos, rotationY: 0 };
 
 		const [tx, tz] = this.path.waypoints[this.waypointIdx]!;
 		const [bx, bz] = botPos;
@@ -40,11 +40,13 @@ export default class Pathfinding {
 		const arrivalRadius = M_GRID_SIZE * 0.5;
 		if (distSq < arrivalRadius * arrivalRadius) {
 			this.waypointIdx++;
-			return botPos;
+			return { pos: botPos, rotationY: 0 };
 		}
 
 		const dist = Math.sqrt(distSq);
 		const move = Math.min(speed * dt, dist);
-		return [bx + (dx2 / dist) * move, bz + (dz2 / dist) * move];
+		const pos = [bx + (dx2 / dist) * move, bz + (dz2 / dist) * move] as Vec2;
+		const rotationY = Math.atan2(dx2, dz2);
+		return { pos, rotationY };
 	}
 }
