@@ -1,4 +1,4 @@
-import { Logger } from "@/utils/Logger";
+import { Logger } from "@/objects/Logger";
 
 export default async function healthController(): Promise<Response> {
 	Logger.info("Health check requested", { context: "HTTP" });

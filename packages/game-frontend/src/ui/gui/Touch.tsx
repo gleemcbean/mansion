@@ -8,20 +8,20 @@ type TouchProps = {
 
 export default function Touch({ value }: TouchProps) {
 	if (/^Key[A-Z]$/.test(value)) {
-		return <div className={styles.touchSquare}>{value.slice(3)}</div>;
+		return <span className={styles.touchSquare}>{value.slice(3)}</span>;
 	} else if (/^Shift(?:Left|Right)?$/.test(value)) {
 		return (
-			<div className={styles.touch}>
+			<span className={styles.touch}>
 				<BsShiftFill className={styles.icon} />
-			</div>
+			</span>
 		);
 	} else if (/^Control(?:Left|Right)?$/.test(value)) {
-		return <div className={styles.touch}>Ctrl</div>;
+		return <span className={styles.touch}>Ctrl</span>;
 	} else if (value === "Space") {
 		return (
-			<div className={styles.touch}>
+			<span className={styles.touch}>
 				<MdSpaceBar className={styles.icon} />
-			</div>
+			</span>
 		);
 	} else {
 		return null;

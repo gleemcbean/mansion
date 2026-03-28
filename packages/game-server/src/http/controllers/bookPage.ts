@@ -5,7 +5,7 @@ import {
 	loadImage,
 	registerFont,
 } from "canvas";
-import type AnomalyType from "@/utils/Anomaly";
+import type AnomalyType from "@/objects/Anomaly";
 import { ANOMALIES } from "@/utils/anomalies";
 
 const BOOK_WIDTH = 438;

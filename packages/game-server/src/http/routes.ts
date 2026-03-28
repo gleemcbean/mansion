@@ -9,7 +9,7 @@ export default async function router(
 	try {
 		const url = new URL(req.url);
 
-		let response: Response;
+		let response: Response | null = null;
 		if (url.pathname === "/health") response = await healthController();
 		if (url.pathname === "/ws") response = await upgradeController(req, server);
 		if (url.pathname === "/book-page") response = await bookPageController(req);

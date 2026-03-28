@@ -13,10 +13,10 @@ import {
 	PL_SPRINT_SPEED_MULTIPLIER,
 	PL_THICKNESS,
 } from "@mansion/shared/constants/player";
+import GameMap from "@mansion/shared/objects/map/GameMap";
 import { ClientPacketType } from "@mansion/shared/types/packets";
 import type { PlayerGameData } from "@mansion/shared/types/player";
 import type { Vec2 } from "@mansion/shared/types/util";
-import { GameMap } from "@mansion/shared/utils/Map";
 import {
 	KeyboardControls as DREIKeyboardControls,
 	useKeyboardControls,
@@ -274,7 +274,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 		}
 
 		map.rooms.forEach((r) => {
-			if (room === r.name || !r.pointIn([t.x, t.z])) return;
+			if (room === r.name || !r.t_pointIn([t.x, t.z])) return;
 			setRoom(r.name);
 		});
 	});

@@ -1,5 +1,5 @@
+import type { Anomaly } from "@mansion/shared/types/anomalies";
 import type { Client } from "@mansion/shared/types/player";
-import type Anomaly from "@mansion/shared/utils/Anomaly";
 import { useMemo } from "react";
 import useLobby from "@/hooks/useLobby";
 import Player from "../Player";
@@ -25,6 +25,8 @@ export default function Doppelganger({ data }: DoppelgangerProps) {
 			crouched: false,
 			lighting: false,
 			running: false,
+			anomalySteps: {},
+			captured: [],
 		};
 
 		return client;

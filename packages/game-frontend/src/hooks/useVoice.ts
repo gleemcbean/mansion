@@ -275,17 +275,20 @@ export default function useVoice() {
 
 			if (!pc.localDescription) return;
 
-			const res = await fetch("http://localhost:8081/offer", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
+			const res = await fetch(
+				`${import.meta.env.VITE_HTTP_PROTOCOL}://${import.meta.env.VITE_SPEECH_SERVICE_URL}/offer`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						sdp: pc.localDescription.sdp,
+						type: pc.localDescription.type,
+						uuid: client.uuid,
+					}),
 				},
-				body: JSON.stringify({
-					sdp: pc.localDescription.sdp,
-					type: pc.localDescription.type,
-					uuid: client.uuid,
-				}),
-			});
+			);
 
 			if (cancelled) return;
 			const answer = await res.json();

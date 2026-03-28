@@ -1,8 +1,8 @@
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { ClientPacketType } from "@mansion/shared/types/packets";
+import { Logger } from "@/objects/Logger";
 import clients from "@/services/client";
-import { Logger } from "@/utils/Logger";
 import type { EventCallback, MessageType, WSData } from "./types";
 
 const events: Map<ClientPacketType, EventCallback> = new Map();

@@ -1,4 +1,4 @@
-import type AnomalyType from "@mansion/shared/utils/Anomaly";
+import type { Anomaly as AnomalyType } from "@mansion/shared/types/anomalies";
 import React from "react";
 import useLobby from "@/hooks/useLobby";
 import Doppelganger from "../entities/anomalies/Doppelganger";

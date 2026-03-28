@@ -1,12 +1,12 @@
+import type GameMap from "@mansion/shared/objects/map/GameMap";
+import Packet from "@mansion/shared/objects/Packet";
 import { LobbyState } from "@mansion/shared/types/lobby";
 import {
 	ClientPacketType,
 	ServerPacketType,
 } from "@mansion/shared/types/packets";
-import type { GameMap } from "@mansion/shared/utils/Map";
-import Packet from "@mansion/shared/utils/Packet";
 import EventHandler from "@/EventHandler";
-import { lobbies } from "@/services/lobby";
+import { lobbies } from "@/objects/Lobby";
 
 export default new EventHandler(
 	ClientPacketType.DoorToggle,

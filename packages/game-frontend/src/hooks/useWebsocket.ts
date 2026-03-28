@@ -26,7 +26,9 @@ export default function useWebsocket() {
 	useEffect(() => {
 		if (ws) return;
 
-		const _ws = new WebSocket("ws://localhost:8080/ws");
+		const _ws = new WebSocket(
+			`${import.meta.env.VITE_WS_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/ws`,
+		);
 
 		_ws.onmessage = (event) => {
 			try {

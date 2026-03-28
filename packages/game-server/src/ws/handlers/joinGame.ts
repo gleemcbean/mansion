@@ -1,10 +1,10 @@
+import Packet from "@mansion/shared/objects/Packet";
 import {
 	ClientPacketType,
 	ServerPacketType,
 } from "@mansion/shared/types/packets";
-import Packet from "@mansion/shared/utils/Packet";
 import EventHandler from "@/EventHandler";
-import { lobbies } from "@/services/lobby";
+import { lobbies } from "@/objects/Lobby";
 
 export default new EventHandler(ClientPacketType.JoinGame, (ws, { code }) => {
 	if (ws.data.lobby || !code) return;

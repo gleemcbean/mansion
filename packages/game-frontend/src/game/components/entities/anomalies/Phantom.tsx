@@ -1,5 +1,6 @@
-import type Anomaly from "@mansion/shared/utils/Anomaly";
-import { GameMap, transform2dVec } from "@mansion/shared/utils/Map";
+import GameMap from "@mansion/shared/objects/map/GameMap";
+import type { Anomaly } from "@mansion/shared/types/anomalies";
+import { transform2dVec } from "@mansion/shared/utils/vectors";
 import { useEffect } from "react";
 import useLobby from "@/hooks/useLobby";
 

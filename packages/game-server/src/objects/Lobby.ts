@@ -2,6 +2,7 @@ import {
 	LB_MAX_PLAYERS,
 	LB_MIN_PLAYERS,
 } from "@mansion/shared/constants/lobby";
+import Packet from "@mansion/shared/objects/Packet";
 import { type LobbyMetadata, LobbyState } from "@mansion/shared/types/lobby";
 import { ServerPacketType } from "@mansion/shared/types/packets";
 import {
@@ -9,13 +10,12 @@ import {
 	PlayerMushroomCapColor,
 } from "@mansion/shared/types/player";
 import type { UUID } from "@mansion/shared/types/util";
-import Packet from "@mansion/shared/utils/Packet";
-import type Anomaly from "@/utils/Anomaly";
+import type Anomaly from "@/objects/Anomaly";
+import Generators from "@/objects/Generators";
 import { ANOMALIES } from "@/utils/anomalies";
-import Generators from "@/utils/Generators";
 import type { WSClient, WSData } from "@/ws/types";
 
-export class Lobby {
+export default class Lobby {
 	public metadata: LobbyMetadata;
 	private players: Map<UUID, WSClient> = new Map();
 	public anomalies: Anomaly[] = [];
@@ -148,9 +148,9 @@ export class Lobby {
 		const spawns = playersArray.map(() => this.metadata.map!.randomSpawn());
 
 		ANOMALIES.forEach((Anomaly) => {
-			const anomaly = new Anomaly();
+			const anomaly = new Anomaly(ws);
 			const anomalySpawn = anomaly.spawn(this.metadata.map!);
-			if (anomalySpawn) this.anomalies.push(anomaly as Anomaly);
+			if (anomalySpawn) this.anomalies.push(anomaly);
 		});
 
 		if (this.updateLoop) clearTimeout(this.updateLoop);
@@ -160,8 +160,6 @@ export class Lobby {
 		this.updateLoop = setInterval(() => {
 			this.anomalies.forEach((anomaly) => {
 				anomaly.update(
-					ws,
-					this.metadata.map!,
 					this.players.values().toArray(),
 					Date.now() - lastUpdate,
 				);

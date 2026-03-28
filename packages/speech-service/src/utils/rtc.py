@@ -4,7 +4,7 @@ from aiohttp import web
 from aiortc import RTCPeerConnection, RTCSessionDescription
 from classes.AudioTrackRelay import AudioTrackRelay
 from classes.AudioProcessor import AudioProcessor
-from constants.config import WEBSOCKET_PORT
+from constants.config import WEBSOCKET_URL
 
 pcs = set()
 client_processors = {}
@@ -16,7 +16,7 @@ async def offer(request):
   pcs.add(pc)
   client_id = params.get("uuid", str(id(pc)))
   
-  processor = AudioProcessor(client_id, f"ws://localhost:{WEBSOCKET_PORT}/ws")
+  processor = AudioProcessor(client_id, f"{WEBSOCKET_URL}/ws")
   client_processors[client_id] = processor
   await processor.start()
   

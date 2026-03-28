@@ -1,4 +1,4 @@
-import { GameMap } from "@mansion/shared/utils/Map";
+import GameMap from "@mansion/shared/objects/map/GameMap";
 import { useEffect, useMemo, useState } from "react";
 import useClient from "@/hooks/useClient";
 import useLobby from "@/hooks/useLobby";

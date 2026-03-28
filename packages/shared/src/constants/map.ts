@@ -1,5 +1,5 @@
-import { CardinalDirection } from "@/types/util";
-import { Room } from "@/utils/Map";
+import Room from "../objects/map/Room";
+import { CardinalDirection } from "../types/util";
 
 // biome-ignore format: Rooms are more readable this way
 export const ROOMS: ReadonlyArray<Room> = Object.freeze([
@@ -65,3 +65,4 @@ export const ROOMS: ReadonlyArray<Room> = Object.freeze([
 export const M_MAX_ROOMS = 15;
 export const M_LEAF_GENERATION_STEP = 1;
 export const M_DOOR_OPEN_PROB = 0.2;
+export const M_GRID_SIZE = 0.25;

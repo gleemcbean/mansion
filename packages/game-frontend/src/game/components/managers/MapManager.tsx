@@ -1,4 +1,4 @@
-import { GameMap } from "@mansion/shared/utils/Map";
+import GameMap from "@mansion/shared/objects/map/GameMap";
 import { RigidBody } from "@react-three/rapier";
 import React, { useMemo } from "react";
 import useLobby from "@/hooks/useLobby";

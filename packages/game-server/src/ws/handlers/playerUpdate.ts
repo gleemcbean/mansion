@@ -1,12 +1,12 @@
+import Packet from "@mansion/shared/objects/Packet";
 import { LobbyState } from "@mansion/shared/types/lobby";
 import {
 	ClientPacketType,
 	ServerPacketType,
 } from "@mansion/shared/types/packets";
 import type { PlayerData } from "@mansion/shared/types/player";
-import Packet from "@mansion/shared/utils/Packet";
 import EventHandler from "@/EventHandler";
-import { lobbies } from "@/services/lobby";
+import { lobbies } from "@/objects/Lobby";
 
 export default new EventHandler(
 	ClientPacketType.PlayerUpdate,

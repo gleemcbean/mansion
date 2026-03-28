@@ -18,7 +18,10 @@ export default function useClient() {
 	const [room, setRoom] = useAtom(roomAtom);
 	const store = useStore();
 
-	const setOption = (option: keyof Options, value: string | number | null) => {
+	const setOption = (
+		option: keyof Options,
+		value: string | boolean | number | null | [string | null, string | null],
+	) => {
 		setOptions((prev) => ({ ...prev, [option]: value }));
 	};
 

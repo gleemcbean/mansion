@@ -1,6 +1,6 @@
 import type { UUID } from "@mansion/shared/types/util";
-import Generators from "@/utils/Generators";
-import { Logger } from "@/utils/Logger";
+import Generators from "@/objects/Generators";
+import { Logger } from "@/objects/Logger";
 import type { WSData } from "@/ws/types";
 
 export default async function upgradeController(

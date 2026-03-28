@@ -1,8 +1,8 @@
+import Packet from "@mansion/shared/objects/Packet";
 import {
 	ClientPacketType,
 	ServerPacketType,
 } from "@mansion/shared/types/packets";
-import Packet from "@mansion/shared/utils/Packet";
 import EventHandler from "@/EventHandler";
 import clients from "@/services/client";
 

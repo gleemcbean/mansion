@@ -1,8 +1,8 @@
+import type GameMap from "@mansion/shared/objects/map/GameMap";
 import type { PlayerGameData } from "@mansion/shared/types/player";
 import { CardinalDirection, type Vec3 } from "@mansion/shared/types/util";
-import type { GameMap } from "@mansion/shared/utils/Map";
-import Anomaly from "@/utils/Anomaly";
-import type { WSClient, WSData } from "@/ws/types";
+import Anomaly from "@/objects/Anomaly";
+import type { WSClient } from "@/ws/types";
 
 export default class Tentacles extends Anomaly {
 	public static override id = "tentacles";
@@ -15,12 +15,7 @@ export default class Tentacles extends Anomaly {
 		return false;
 	}
 
-	public override update(
-		_ws: Bun.ServerWebSocket<WSData>,
-		_map: GameMap,
-		_players: WSClient[],
-		_deltaTime: number,
-	): void {}
+	public override update(_players: WSClient[], _deltaTime: number): void {}
 
 	public override spawn(map: GameMap): [Vec3, Vec3] | null {
 		const bedrooms = map.rooms.filter(

@@ -1,12 +1,12 @@
+import Packet from "@mansion/shared/objects/Packet";
 import { LobbyState } from "@mansion/shared/types/lobby";
 import {
 	ClientPacketType,
 	ServerPacketType,
 } from "@mansion/shared/types/packets";
-import Packet from "@mansion/shared/utils/Packet";
 import EventHandler from "@/EventHandler";
+import { lobbies } from "@/objects/Lobby";
 import clients from "@/services/client";
-import { lobbies } from "@/services/lobby";
 
 export default new EventHandler(
 	ClientPacketType.VoiceSyllable,

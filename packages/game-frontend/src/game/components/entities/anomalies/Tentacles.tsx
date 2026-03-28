@@ -1,4 +1,4 @@
-import type Anomaly from "@mansion/shared/utils/Anomaly";
+import type { Anomaly } from "@mansion/shared/types/anomalies";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { RigidBody } from "@react-three/rapier";
@@ -32,8 +32,10 @@ export default function Tentacles({ data }: TentaclesProps) {
 	// 	</RigidBody>
 	// );
 
-	return <mesh position={data.position} rotation={data.rotation}>
-		<boxGeometry attach="geometry" args={[1, 1, 1]} />
-		<meshStandardMaterial attach="material" color="#e06b6b" />
-	</mesh>;
+	return (
+		<mesh position={data.position} rotation={data.rotation}>
+			<boxGeometry attach="geometry" args={[1, 1, 1]} />
+			<meshStandardMaterial attach="material" color="#e06b6b" />
+		</mesh>
+	);
 }

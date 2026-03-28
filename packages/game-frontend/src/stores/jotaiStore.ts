@@ -1,3 +1,4 @@
+import type { Anomaly } from "@mansion/shared/types/anomalies";
 import type { LobbyMetadata } from "@mansion/shared/types/lobby";
 import type {
 	ServerPacketMap,
@@ -5,7 +6,6 @@ import type {
 } from "@mansion/shared/types/packets";
 import type { Client, PlayerGameData } from "@mansion/shared/types/player";
 import type { UUID } from "@mansion/shared/types/util";
-import type Anomaly from "@mansion/shared/utils/Anomaly";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { DEFAULT_OPTIONS } from "@/constants/Options";

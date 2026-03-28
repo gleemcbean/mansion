@@ -4,10 +4,12 @@ import {
 	M_MAX_ROOMS,
 	ROOMS,
 } from "@mansion/shared/constants/map";
+import GameMap from "@mansion/shared/objects/map/GameMap";
+import PositionedRoom from "@mansion/shared/objects/map/PositionedRoom";
+import type Room from "@mansion/shared/objects/map/Room";
 import type { Door } from "@mansion/shared/types/map";
 import type { UUID, Vec2 } from "@mansion/shared/types/util";
-import { GameMap, PositionedRoom, type Room } from "@mansion/shared/utils/Map";
-import { lobbies } from "@/services/lobby";
+import { lobbies } from "@/objects/Lobby";
 
 export default class Generators {
 	public static generateLobbyCode(): string {

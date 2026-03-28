@@ -127,10 +127,10 @@ export default function Options({ back }: OptionsProps) {
 				ref={scrollerRef}
 			>
 				{OPTIONS_COMPONENTS[Object.values(OptionCategory)[selected]].map(
-					(component, index) => {
+					(component) => {
 						if (component.separator) {
 							return (
-								<h3 key={index} className={styles.separator}>
+								<h3 key={component.label} className={styles.separator}>
 									{component.label}
 								</h3>
 							);
@@ -171,6 +171,9 @@ export default function Options({ back }: OptionsProps) {
 										}
 									/>
 								);
+
+							default:
+								return null;
 						}
 					},
 				)}

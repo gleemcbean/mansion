@@ -1,10 +1,10 @@
+import Packet from "@mansion/shared/objects/Packet";
 import {
 	ClientPacketType,
 	ServerPacketType,
 } from "@mansion/shared/types/packets";
-import Packet from "@mansion/shared/utils/Packet";
 import EventHandler from "@/EventHandler";
-import { Lobby } from "@/services/lobby";
+import Lobby from "@/objects/Lobby";
 import type { WSClient } from "../types";
 
 export default new EventHandler(ClientPacketType.HostGame, (ws) => {

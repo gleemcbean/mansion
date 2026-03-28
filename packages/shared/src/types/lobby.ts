@@ -1,4 +1,4 @@
-import type { GameMap } from "@/utils/Map";
+import type GameMap from "@/objects/map/GameMap";
 import type { UUID } from "./util";
 
 export enum LobbyState {

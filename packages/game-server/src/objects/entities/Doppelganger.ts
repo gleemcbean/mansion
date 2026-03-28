@@ -1,12 +1,14 @@
+import type GameMap from "@mansion/shared/objects/map/GameMap";
 import type { PlayerGameData } from "@mansion/shared/types/player";
-import type { Vec3 } from "@mansion/shared/types/util";
-import type { GameMap } from "@mansion/shared/utils/Map";
-import Anomaly from "@/utils/Anomaly";
-import type { WSClient, WSData } from "@/ws/types";
+import type { Vec2, Vec3 } from "@mansion/shared/types/util";
+import { transform2dVec } from "@mansion/shared/utils/vectors";
+import Anomaly, { AnomalyState } from "@/objects/Anomaly";
+import type { WSClient } from "@/ws/types";
 
 export default class Doppelganger extends Anomaly {
 	public static override id = "doppelganger";
 	public static override name = "Doppelgänger";
+	public focus: Vec2 | null = null;
 
 	public static override description =
 		"A mysterious entity that mimics the appearance of fungies within the mansion.\nCast your spell before it gets too close.";
@@ -15,12 +17,19 @@ export default class Doppelganger extends Anomaly {
 		return false;
 	}
 
-	public override update(
-		_ws: Bun.ServerWebSocket<WSData>,
-		_map: GameMap,
-		_players: WSClient[],
-		_deltaTime: number,
-	) {}
+	private updateRoam() {
+		if (!this.focus) return;
+
+		transform2dVec(this.position);
+	}
+
+	public override update(_players: WSClient[], _deltaTime: number) {
+		switch (this.state) {
+			case AnomalyState.Roam:
+				this.updateRoam();
+				break;
+		}
+	}
 
 	public override spawn(map: GameMap): [Vec3, Vec3] | null {
 		const spawn = map.randomSpawn();

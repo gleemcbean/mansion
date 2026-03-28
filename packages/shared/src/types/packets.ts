@@ -14,7 +14,6 @@ export enum ClientPacketType {
 	PromotePlayer = "promote-player",
 	PlayerUpdate = "player-update",
 	DoorToggle = "door-toggle",
-	RoomUpdate = "room-update",
 	RTCSignalOffer = "rtc-signal-offer",
 	RTCSignalAnswer = "rtc-signal-answer",
 	RTCSignalCandidate = "rtc-signal-candidate",
@@ -33,6 +32,7 @@ export enum ServerPacketType {
 	Kicked = "kicked",
 	GameStarted = "game-started",
 	PlayerUpdate = "player-update",
+	AnomalyUpdate = "anomaly-update",
 	DoorToggle = "door-toggle",
 	RoomUpdate = "room-update",
 	RTCSignalOffer = "rtc-signal-offer",
@@ -62,7 +62,6 @@ export type ClientPacketMap = {
 	[ClientPacketType.PromotePlayer]: { uuid: UUID };
 	[ClientPacketType.PlayerUpdate]: { gameData: PlayerGameData };
 	[ClientPacketType.DoorToggle]: { doorUuid: UUID, isOpen: boolean };
-	[ClientPacketType.RoomUpdate]: { roomUuid: UUID };
 	[ClientPacketType.RTCSignalOffer]: { to: UUID; from: UUID; sdp: string };
 	[ClientPacketType.RTCSignalAnswer]: { to: UUID; from: UUID; sdp: string };
 	[ClientPacketType.RTCSignalCandidate]: { to: UUID; from: UUID; candidate: RTCIceCandidateInit };
@@ -82,6 +81,7 @@ export type ServerPacketMap = {
 	[ServerPacketType.Kicked]: {};
 	[ServerPacketType.GameStarted]: { metadata: LobbyMetadata; gameData: PlayerGameData, anomalies: Anomaly[] };
 	[ServerPacketType.PlayerUpdate]: { uuid: UUID; client: Client };
+	[ServerPacketType.AnomalyUpdate]: { anomalyId: string, data: Omit<Anomaly, 'id'> };
 	[ServerPacketType.DoorToggle]: { doorUuid: UUID, isOpen: boolean };
 	[ServerPacketType.RoomUpdate]: { roomUuid: UUID };
 	[ServerPacketType.RTCSignalOffer]: { from: UUID; sdp: string };

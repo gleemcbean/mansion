@@ -1,6 +1,6 @@
 import { ClientPacketType } from "@mansion/shared/types/packets";
 import EventHandler from "@/EventHandler";
-import { lobbies } from "@/services/lobby";
+import { lobbies } from "@/objects/Lobby";
 
 export default new EventHandler(ClientPacketType.LeaveGame, (ws) => {
 	if (!ws.data.lobby) return;

@@ -27,7 +27,13 @@
 				"noNonNullAssertion": "off"
 			},
 			"a11y": {
-				"noStaticElementInteractions": "off"
+				"noStaticElementInteractions": "off",
+				"useKeyWithClickEvents": "off",
+				"noAutofocus": "off"
+			},
+			"suspicious": {
+				"noExplicitAny": "off",
+				"noDocumentCookie": "off"
 			}
 		}
 	},

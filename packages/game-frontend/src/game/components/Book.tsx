@@ -205,7 +205,9 @@ export default function Book() {
 
 		for (let i = 0; i < 2; i++) {
 			const anomaly = anomalies[page.current * 2 + i];
-			const url = new URL("http://localhost:8080/book-page");
+			const url = new URL(
+				`${import.meta.env.VITE_HTTP_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/book-page`,
+			);
 
 			if (anomaly) {
 				url.searchParams.append(

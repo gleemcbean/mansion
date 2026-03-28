@@ -1,14 +1,12 @@
+import type GameMap from "@mansion/shared/objects/map/GameMap";
+import type PositionedRoom from "@mansion/shared/objects/map/PositionedRoom";
+import Packet from "@mansion/shared/objects/Packet";
 import { ServerPacketType } from "@mansion/shared/types/packets";
 import type { PlayerGameData } from "@mansion/shared/types/player";
 import type { Vec3 } from "@mansion/shared/types/util";
-import {
-	type GameMap,
-	type PositionedRoom,
-	transform2dVec,
-} from "@mansion/shared/utils/Map";
-import Packet from "@mansion/shared/utils/Packet";
-import Anomaly from "@/utils/Anomaly";
-import type { WSClient, WSData } from "@/ws/types";
+import { transform2dVec } from "@mansion/shared/utils/vectors";
+import Anomaly from "@/objects/Anomaly";
+import type { WSClient } from "@/ws/types";
 
 enum PhantomPhases {
 	Idle,
@@ -28,12 +26,7 @@ export default class Phantom extends Anomaly {
 	public static override description =
 		"A ghostly entity that haunts the corridors of the mansion, instilling fear in those who cross its path.\nStay out of the red lights to avoid its wrath.";
 
-	public override update(
-		ws: Bun.ServerWebSocket<WSData>,
-		_map: GameMap,
-		players: WSClient[],
-		_deltaTime: number,
-	): void {
+	public override update(players: WSClient[], _deltaTime: number): void {
 		if (!this.room) return;
 
 		let presence = false;
@@ -42,7 +35,8 @@ export default class Phantom extends Anomaly {
 			players
 				.map((p) => p.playerData!.gameData!)
 				.filter(
-					(p) => this.room!.pointIn(transform2dVec(p.position)) && !p.crouched,
+					(p) =>
+						this.room!.t_pointIn(transform2dVec(p.position)) && !p.crouched,
 				).length > 0
 		) {
 			presence = true;
@@ -57,8 +51,8 @@ export default class Phantom extends Anomaly {
 				this.timeouts.push(
 					setTimeout(() => {
 						this.room!.doorUUIDs.forEach((doorUuid) => {
-							ws.publish(
-								ws.data.lobby!,
+							this.ws.publish(
+								this.ws.data.lobby!,
 								Packet.create(ServerPacketType.DoorToggle, {
 									doorUuid,
 									isOpen: false,
@@ -112,7 +106,7 @@ export default class Phantom extends Anomaly {
 
 	public override canCastSpell(playerData: PlayerGameData): boolean {
 		if (!this.room) return false;
-		return this.room.pointIn(transform2dVec(playerData.position));
+		return this.room.t_pointIn(transform2dVec(playerData.position));
 	}
 
 	public override get entityData() {
