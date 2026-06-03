@@ -1,9 +1,10 @@
 import type { Anomaly } from "@mansion/shared/types/anomalies";
-import { useGLTF } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import { RigidBody } from "@react-three/rapier";
-import { useEffect, useMemo, useState } from "react";
-import { SkeletonUtils } from "three/examples/jsm/Addons.js";
+
+// import { useGLTF } from "@react-three/drei";
+// import { useFrame } from "@react-three/fiber";
+// import { RigidBody } from "@react-three/rapier";
+// import { useEffect, useMemo, useState } from "react";
+// import { SkeletonUtils } from "three/examples/jsm/Addons.js";
 
 type TentaclesProps = {
 	data: Anomaly;

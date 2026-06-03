@@ -119,6 +119,7 @@ export default class Generators {
 				if (positioned) {
 					door.openable = true;
 					door.opened = Math.random() <= M_DOOR_OPEN_PROB;
+					(positioned as PositionedRoom).doorUUIDs.push(door.uuid);
 
 					available.splice(
 						available.findIndex(

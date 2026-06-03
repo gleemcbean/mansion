@@ -37,6 +37,7 @@
 		"@types/react-dom": "^19.1.9",
 		"@types/react-helmet": "^6.1.11",
 		"@vitejs/plugin-react": "^5.0.3",
+		"baseline-browser-mapping": "^2.10.12",
 		"globals": "^16.4.0",
 		"react-helmet": "^6.1.0",
 		"sass": "^1.93.0",

@@ -1,5 +1,4 @@
-import GameMap from "@mansion/shared/objects/map/GameMap";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import useClient from "@/hooks/useClient";
 import useLobby from "@/hooks/useLobby";
 import PlayerIcon from "../components/PlayerIcon";
@@ -18,9 +17,8 @@ type MinimapProps = {
 const STROKE = 0.1;
 
 export default function Minimap({ size = 250 }: MinimapProps) {
-	const { metadata } = useLobby();
+	const { map } = useLobby();
 	const { client, room, subGameData } = useClient();
-	const map = useMemo(() => GameMap.fromJSON(metadata!.map), [metadata]);
 	const [gameData, setGameData] = useState<MinimapGameData>({
 		viewBox: "0 0 0 0",
 		mapRotation: "rotate(0 0 0)",
@@ -53,7 +51,7 @@ export default function Minimap({ size = 250 }: MinimapProps) {
 					<svg width={size} height={size} viewBox={gameData.viewBox}>
 						<title>Minimap</title>
 						<g transform={gameData.mapRotation}>
-							{map.rooms.map((room) => {
+							{map?.rooms.map((room) => {
 								const points = room.t_topology
 									.map(([x, y]) => `${x},${y}`)
 									.join(" ");
@@ -68,7 +66,7 @@ export default function Minimap({ size = 250 }: MinimapProps) {
 									/>
 								);
 							})}
-							{map.doors.map(
+							{map?.doors.map(
 								(door) =>
 									door.openable && (
 										<rect

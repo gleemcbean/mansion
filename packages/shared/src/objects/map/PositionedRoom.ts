@@ -55,6 +55,13 @@ export default class PositionedRoom extends Room {
 		this.direction = direction;
 	}
 
+	public override updateFromPartial(data: Partial<PositionedRoom>) {
+		super.updateFromPartial(data);
+		if (data.position) this.position = data.position;
+		if (data.direction !== undefined) this.direction = data.direction;
+		if (data.anomalies) this.anomalies = data.anomalies;
+	}
+
 	public translate<T extends CardinalDirection | undefined>(
 		[x, y]: Vec2,
 		direction: T = undefined as T,
@@ -255,5 +262,21 @@ export default class PositionedRoom extends Room {
 		}
 
 		return grid;
+	}
+
+	public toJSON() {
+		return {
+			uuid: this.uuid,
+			id: this.id,
+			name: this.name,
+			multiplicity: this.multiplicity,
+			topology: this.topology,
+			spawns: this.spawns,
+			doorPoints: this.doorPoints,
+			lights: this.lights,
+			position: this.position,
+			direction: this.direction,
+			anomalies: this.anomalies,
+		};
 	}
 }

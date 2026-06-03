@@ -15,6 +15,7 @@ export const PL_JUMP_FORCE = 1.2;
 // FOV
 export const PL_FOV = 90;
 export const PL_SPRINT_FOV = 120;
+export const PL_CROUCH_FOV = 60;
 
 // OTHER
 export const PL_MAX_HEALTH = 100;

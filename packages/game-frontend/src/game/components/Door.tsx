@@ -103,7 +103,7 @@ export default function Door({ data }: DoorProps) {
 					setDoorState(!isOpen.current);
 
 					send(ClientPacketType.DoorToggle, {
-						doorUuid: data.uuid,
+						doorUUID: data.uuid,
 						isOpen: isOpen.current,
 					});
 				}
@@ -112,9 +112,9 @@ export default function Door({ data }: DoorProps) {
 
 	useLayoutEffect(() => {
 		const unsubscribe = addHandler(
-			ServerPacketType.DoorToggle,
-			({ doorUuid, isOpen }) => {
-				if (doorUuid !== data.uuid) return;
+			ServerPacketType.DoorsToggle,
+			({ doorUUIDs, isOpen }) => {
+				if (!doorUUIDs.includes(data.uuid)) return;
 				setDoorState(isOpen);
 			},
 		);

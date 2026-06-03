@@ -10,7 +10,7 @@ type PointerLockControlsProps = {
 	damping?: number;
 };
 
-const ANTI_GITTER_THRESHOLD = 300;
+const ANTI_GITTER_THRESHOLD_SQ = 300 ** 2;
 
 export default function PointerLockControls({
 	sensitivity = 0.002,
@@ -27,32 +27,38 @@ export default function PointerLockControls({
 	const targetYaw = useRef(0);
 	const targetPitch = useRef(0);
 
+	const sensitivityRef = useRef(sensitivity);
+	const minPolarAngleRef = useRef(minPolarAngle);
+	const maxPolarAngleRef = useRef(maxPolarAngle);
+	const smoothRef = useRef(smooth);
+	const dampingRef = useRef(damping);
+
+	sensitivityRef.current = sensitivity;
+	minPolarAngleRef.current = minPolarAngle;
+	maxPolarAngleRef.current = maxPolarAngle;
+	smoothRef.current = smooth;
+	dampingRef.current = damping;
+
 	useEffect(() => {
-		gl.domElement.requestPointerLock();
+		const canvas = gl.domElement;
+
+		canvas.requestPointerLock();
 
 		const handleMouseMove = (e: MouseEvent) => {
-			if (document.pointerLockElement !== gl.domElement) return;
+			if (document.pointerLockElement !== canvas) return;
 
-			const movementDistance = Math.sqrt(
-				e.movementX * e.movementX + e.movementY * e.movementY,
-			);
+			const distSq = e.movementX * e.movementX + e.movementY * e.movementY;
+			if (distSq > ANTI_GITTER_THRESHOLD_SQ) return;
 
-			if (movementDistance > ANTI_GITTER_THRESHOLD) return;
-
-			targetYaw.current -= e.movementX * sensitivity;
-			targetPitch.current -= e.movementY * sensitivity;
-
+			targetYaw.current -= e.movementX * sensitivityRef.current;
+			targetPitch.current -= e.movementY * sensitivityRef.current;
 			targetPitch.current = Math.max(
-				minPolarAngle,
-				Math.min(maxPolarAngle, targetPitch.current),
+				minPolarAngleRef.current,
+				Math.min(maxPolarAngleRef.current, targetPitch.current),
 			);
 		};
 
-		const handleClick = () => {
-			gl.domElement.requestPointerLock();
-		};
-
-		const canvas = document.querySelector("canvas")!;
+		const handleClick = () => canvas.requestPointerLock();
 
 		canvas.addEventListener("mousemove", handleMouseMove);
 		canvas.addEventListener("click", handleClick);
@@ -61,12 +67,13 @@ export default function PointerLockControls({
 			canvas.removeEventListener("mousemove", handleMouseMove);
 			canvas.removeEventListener("click", handleClick);
 		};
-	}, [gl, sensitivity, minPolarAngle, maxPolarAngle]);
+	}, [gl]);
 
 	useFrame(() => {
-		if (smooth) {
-			yaw.current += (targetYaw.current - yaw.current) * damping;
-			pitch.current += (targetPitch.current - pitch.current) * damping;
+		if (smoothRef.current) {
+			yaw.current += (targetYaw.current - yaw.current) * dampingRef.current;
+			pitch.current +=
+				(targetPitch.current - pitch.current) * dampingRef.current;
 		} else {
 			yaw.current = targetYaw.current;
 			pitch.current = targetPitch.current;

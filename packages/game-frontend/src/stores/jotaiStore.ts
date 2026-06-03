@@ -1,3 +1,4 @@
+import type GameMap from "@mansion/shared/objects/map/GameMap";
 import type { Anomaly } from "@mansion/shared/types/anomalies";
 import type { LobbyMetadata } from "@mansion/shared/types/lobby";
 import type {
@@ -14,6 +15,7 @@ export type PacketCallback = (d: ServerPacketMap[ServerPacketType]) => void;
 export type PacketSet = Set<PacketCallback>;
 
 export const lobbyMetadataAtom = atom<LobbyMetadata | null>(null);
+export const lobbyMapAtom = atom<GameMap | null>(null);
 export const playersAtom = atom<Map<UUID, Client>>(new Map());
 export const anomaliesAtom = atom<Map<string, Anomaly>>(new Map());
 

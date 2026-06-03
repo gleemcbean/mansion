@@ -1,4 +1,5 @@
 import { LB_MIN_PLAYERS } from "@mansion/shared/constants/lobby";
+import GameMap from "@mansion/shared/objects/map/GameMap";
 import type { LobbyMetadata } from "@mansion/shared/types/lobby";
 import {
 	ClientPacketType,
@@ -121,7 +122,7 @@ function PlayerItem({
 			<PlayerIcon
 				color={player.playerData!.mushroomCapColor}
 				className={styles.icon}
-				owner={player.uuid === metadata!.ownerUuid}
+				owner={player.uuid === metadata!.ownerUUID}
 			/>
 			<p className={styles.username}>{player.username}</p>
 			<div className={styles.playerControls}>
@@ -234,6 +235,7 @@ export default function Lobby({ back }: LobbyProps) {
 		addPlayer,
 		removePlayer,
 		fillAnomalies,
+		setMap,
 	} = useLobby();
 	const {
 		isPlayerMuted,
@@ -275,7 +277,7 @@ export default function Lobby({ back }: LobbyProps) {
 	const closeLobby = () => {
 		if (!opened) return;
 
-		if (metadata!.ownerUuid === client.uuid) {
+		if (metadata!.ownerUUID === client.uuid) {
 			send(ClientPacketType.CloseGame);
 		} else {
 			send(ClientPacketType.LeaveGame);
@@ -326,8 +328,9 @@ export default function Lobby({ back }: LobbyProps) {
 			}),
 			addHandler(
 				ServerPacketType.GameStarted,
-				({ metadata, gameData, anomalies }) => {
+				({ metadata, map, gameData, anomalies }) => {
 					setMetadata(metadata);
+					setMap(GameMap.fromJSON(map));
 					fillAnomalies(anomalies);
 					client.playerData!.gameData = gameData;
 				},
@@ -358,7 +361,7 @@ export default function Lobby({ back }: LobbyProps) {
 							key={p.uuid}
 							player={p}
 							isMe={p.uuid === client.uuid}
-							iAmOwner={metadata!.ownerUuid === client.uuid}
+							iAmOwner={metadata!.ownerUUID === client.uuid}
 							metadata={metadata!}
 							options={options}
 							hover={hover}
@@ -399,7 +402,7 @@ export default function Lobby({ back }: LobbyProps) {
 						)}
 					</button>
 				</div>
-				{metadata!.ownerUuid === client.uuid ? (
+				{metadata!.ownerUUID === client.uuid ? (
 					<React.Fragment>
 						<button
 							type="button"

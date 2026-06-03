@@ -3,7 +3,7 @@ import {
 	PL_MAX_STAMINA,
 } from "@mansion/shared/constants/player";
 // import { useProgress } from "@react-three/drei";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa";
 import { FaBoltLightning } from "react-icons/fa6";
 import useClient from "@/hooks/useClient";
@@ -55,48 +55,52 @@ export default function Hud() {
 					/>
 				</div>
 			</div>
-			{selectorTooltip && (
-				<p className={styles.selectorTooltip}>
-					<span>
-						Press <Touch value={options.interact[0]!} /> to{" "}
-					</span>
-					<span>{selectorTooltip.toLowerCase()}</span>
-				</p>
+			{options.tooltips && (
+				<React.Fragment>
+					{selectorTooltip && (
+						<p className={styles.selectorTooltip}>
+							<span>
+								Press <Touch value={options.interact[0]!} /> to{" "}
+							</span>
+							<span>{selectorTooltip.toLowerCase()}</span>
+						</p>
+					)}
+					<div className={styles.topTooltip}>
+						{!bookOpen && (
+							<p>
+								<Touch value={options.sprint[0]!} />
+								<span> Sprint</span>
+							</p>
+						)}
+						{!bookOpen && (
+							<p>
+								<Touch value={options.crouch[0]!} />
+								<span> Hide</span>
+							</p>
+						)}
+						<p>
+							<Touch value={options.light[0]!} />
+							<span> Toggle flashlight</span>
+						</p>
+						<p>
+							<Touch value={options.book[0]!} />
+							<span> {bookOpen ? "Close" : "Open"} book</span>
+						</p>
+						{bookOpen && (
+							<p>
+								<Touch value={options.left[0]!} />
+								<span> Previous page</span>
+							</p>
+						)}
+						{bookOpen && (
+							<p>
+								<Touch value={options.right[0]!} />
+								<span> Next page</span>
+							</p>
+						)}
+					</div>
+				</React.Fragment>
 			)}
-			<div className={styles.topTooltip}>
-				{!bookOpen && (
-					<p>
-						<Touch value={options.sprint[0]!} />
-						<span> Sprint</span>
-					</p>
-				)}
-				{!bookOpen && (
-					<p>
-						<Touch value={options.crouch[0]!} />
-						<span> Hide</span>
-					</p>
-				)}
-				<p>
-					<Touch value={options.light[0]!} />
-					<span> Toggle flashlight</span>
-				</p>
-				<p>
-					<Touch value={options.book[0]!} />
-					<span> {bookOpen ? "Close" : "Open"} book</span>
-				</p>
-				{bookOpen && (
-					<p>
-						<Touch value={options.left[0]!} />
-						<span> Previous page</span>
-					</p>
-				)}
-				{bookOpen && (
-					<p>
-						<Touch value={options.right[0]!} />
-						<span> Next page</span>
-					</p>
-				)}
-			</div>
 		</div>
 	);
 }

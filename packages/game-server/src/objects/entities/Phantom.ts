@@ -1,5 +1,6 @@
 import type PositionedRoom from "@mansion/shared/objects/map/PositionedRoom";
 import Packet from "@mansion/shared/objects/Packet";
+import { AnomalyState } from "@mansion/shared/types/anomalies";
 import { ServerPacketType } from "@mansion/shared/types/packets";
 import type { PlayerGameData } from "@mansion/shared/types/player";
 import type { Vec3 } from "@mansion/shared/types/util";
@@ -7,22 +8,26 @@ import { transform2dVec } from "@mansion/shared/utils/vectors";
 import Anomaly from "@/objects/Anomaly";
 import type { WSClient } from "@/ws/types";
 
-enum PhantomPhases {
-	Idle,
-	Warning,
-	Damaging,
-}
-
 export default class Phantom extends Anomaly {
 	public static override id = "phantom";
 	public static override name = "Phantom";
 
 	private room: PositionedRoom | null = null;
-	private presence = false;
-	private phase: PhantomPhases = PhantomPhases.Idle;
+	private presence: boolean = false;
 
 	public static override description =
 		"A ghostly entity that haunts the corridors of the mansion, instilling fear in those who cross its path.\nStay out of the red lights to avoid its wrath.";
+
+	private updateState(state: AnomalyState) {
+		this.state = state;
+
+		this.ws.send(
+			Packet.create(ServerPacketType.AnomalyUpdate, {
+				anomalyId: this.id,
+				data: this.toJSON(),
+			}),
+		);
+	}
 
 	public override update(players: WSClient[], _deltaTime: number): void {
 		if (this.paused || !this.room) return;
@@ -42,44 +47,25 @@ export default class Phantom extends Anomaly {
 
 		if (this.presence !== presence) {
 			if (presence) {
-				this.phase = PhantomPhases.Warning;
+				this.updateState(AnomalyState.Move);
 
 				this.timeouts.push(
 					setTimeout(() => {
-						this.room!.doorUUIDs.forEach((doorUuid) => {
-							this.ws.send(
-								Packet.create(ServerPacketType.DoorToggle, {
-									doorUuid,
-									isOpen: false,
-								}),
-							);
-						});
+						this.ws.send(
+							Packet.create(ServerPacketType.DoorsToggle, {
+								doorUUIDs: this.room!.doorUUIDs,
+								isOpen: false,
+							}),
+						);
 					}, 500),
 				);
 
 				this.timeouts.push(
-					setTimeout(() => {
-						this.room!.lights.forEach((light) => {
-							light.color = 0xc7001b;
-							light.intensity = 2;
-						});
-
-						this.phase = PhantomPhases.Damaging;
-					}, 3000),
+					setTimeout(() => this.updateState(AnomalyState.Chase), 3000),
 				);
 			} else {
-				this.phase = PhantomPhases.Idle;
-
-				this.timeouts.forEach((timeout) => {
-					clearTimeout(timeout);
-				});
-
-				this.timeouts = [];
-
-				this.room.lights.forEach((light) => {
-					delete light.color;
-					delete light.intensity;
-				});
+				this.updateState(AnomalyState.Roam);
+				this.kill();
 			}
 		}
 
@@ -106,9 +92,8 @@ export default class Phantom extends Anomaly {
 
 	public override get entityData() {
 		return {
-			roomId: this.room?.id ?? null,
+			roomUUID: this.room?.uuid ?? null,
 			presence: this.presence,
-			phase: this.phase,
 		};
 	}
 }

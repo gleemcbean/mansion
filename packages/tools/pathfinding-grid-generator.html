@@ -366,16 +366,16 @@
           const center = new THREE.Vector3();
           box.getCenter(center);
           
-          const maxDim = Math.max(modelBounds.size.x, modelBounds.size.y, modelBounds.size.z);
+          const maxDim = Math.max(modelBounds.size.x, modelBounds.size.y, modelBounds.size.y);
           camera.position.set(
             center.x + maxDim * 1.5,
             center.y + maxDim * 1.5,
-            center.z + maxDim * 1.5
+            center.y + maxDim * 1.5
           );
           controls.target.copy(center);
           controls.update();
           
-          status.textContent = `Model loaded! Bounds: ${modelBounds.size.x.toFixed(2)} x ${modelBounds.size.y.toFixed(2)} x ${modelBounds.size.z.toFixed(2)}`;
+          status.textContent = `Model loaded! Bounds: ${modelBounds.size.x.toFixed(2)} x ${modelBounds.size.y.toFixed(2)} x ${modelBounds.size.y.toFixed(2)}`;
           generateBtn.disabled = false;
         }, (error) => {
           status.textContent = 'Error loading model: ' + error;
@@ -397,7 +397,7 @@
       status.textContent = 'Generating navigation grid...';
       
       const gridWidth = Math.ceil(modelBounds.size.x / gridSize);
-      const gridDepth = Math.ceil(modelBounds.size.z / gridSize);
+      const gridDepth = Math.ceil(modelBounds.size.y / gridSize);
       
       const grid = Array(gridDepth).fill(null).map(() => Array(gridWidth).fill(true));
       
@@ -406,10 +406,10 @@
       
       const sampleAngles = [0, Math.PI/4, Math.PI/2, 3*Math.PI/4, Math.PI, 5*Math.PI/4, 3*Math.PI/2, 7*Math.PI/4];
       
-      for (let z = 0; z < gridDepth; z++) {
+      for (let y = 0; y < gridDepth; y++) {
         for (let x = 0; x < gridWidth; x++) {
           const worldX = modelBounds.min.x + (x + 0.5) * gridSize;
-          const worldZ = modelBounds.min.z + (z + 0.5) * gridSize;
+          const worldZ = modelBounds.min.y + (y + 0.5) * gridSize;
           
           let isWalkable = true;
           const heightSamples = 8;
@@ -463,7 +463,7 @@
             if (!isWalkable) break;
           }
           
-          grid[z][x] = isWalkable;
+          grid[y][x] = isWalkable;
         }
       }
       
@@ -478,8 +478,8 @@
         bounds: {
           minX: modelBounds.min.x,
           maxX: modelBounds.max.x,
-          minZ: modelBounds.min.z,
-          maxZ: modelBounds.max.z
+          minZ: modelBounds.min.y,
+          maxZ: modelBounds.max.y
         },
         character: {
           height: charHeight,
@@ -515,42 +515,42 @@
         }
       }
       
-      for (let z = 1; z < height - 1; z++) {
-        if (grid[z][0]) {
-          queue.push([0, z]);
-          connected[z][0] = true;
+      for (let y = 1; y < height - 1; y++) {
+        if (grid[y][0]) {
+          queue.push([0, y]);
+          connected[y][0] = true;
         }
       }
       
-      for (let z = 1; z < height - 1; z++) {
-        if (grid[z][width-1]) {
-          queue.push([width-1, z]);
-          connected[z][width-1] = true;
+      for (let y = 1; y < height - 1; y++) {
+        if (grid[y][width-1]) {
+          queue.push([width-1, y]);
+          connected[y][width-1] = true;
         }
       }
       
       const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
       
       while (queue.length > 0) {
-        const [x, z] = queue.shift();
+        const [x, y] = queue.shift();
         
-        for (const [dx, dz] of directions) {
+        for (const [dx, dy] of directions) {
           const nx = x + dx;
-          const nz = z + dz;
+          const ny = y + dy;
           
-          if (nx >= 0 && nx < width && nz >= 0 && nz < height) {
-            if (grid[nz][nx] && !connected[nz][nx]) {
-              connected[nz][nx] = true;
-              queue.push([nx, nz]);
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            if (grid[ny][nx] && !connected[ny][nx]) {
+              connected[ny][nx] = true;
+              queue.push([nx, ny]);
             }
           }
         }
       }
       
-      for (let z = 0; z < height; z++) {
+      for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
-          if (grid[z][x] && !connected[z][x]) {
-            grid[z][x] = false; 
+          if (grid[y][x] && !connected[y][x]) {
+            grid[y][x] = false; 
           }
         }
       }
@@ -568,15 +568,15 @@
       
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      for (let z = 0; z < gridDepth; z++) {
+      for (let y = 0; y < gridDepth; y++) {
         for (let x = 0; x < gridWidth; x++) {
-          const isWalkable = grid[z][x];
+          const isWalkable = grid[y][x];
           ctx.fillStyle = isWalkable ? '#4ade80' : '#ef4444';
-          ctx.fillRect(x * cellWidth, z * cellHeight, cellWidth, cellHeight);
+          ctx.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
           
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 0.5;
-          ctx.strokeRect(x * cellWidth, z * cellHeight, cellWidth, cellHeight);
+          ctx.strokeRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
         }
       }
     }

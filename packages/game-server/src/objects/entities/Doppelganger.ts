@@ -1,10 +1,11 @@
 import Packet from "@mansion/shared/objects/Packet";
+import { AnomalyState } from "@mansion/shared/types/anomalies";
 import { ServerPacketType } from "@mansion/shared/types/packets";
 import type { PlayerGameData } from "@mansion/shared/types/player";
 import type { Vec2, Vec3 } from "@mansion/shared/types/util";
-import { wait, waitRandom } from "@mansion/shared/utils/time";
+import { waitRandom } from "@mansion/shared/utils/time";
 import { transform2dVec, transform3dVec } from "@mansion/shared/utils/vectors";
-import Anomaly, { AnomalyState } from "@/objects/Anomaly";
+import Anomaly from "@/objects/Anomaly";
 import type { Grid } from "@/utils/pathfinding/grid";
 import type { WSClient } from "@/ws/types";
 import Pathfinding from "../Pathfinding";
@@ -14,7 +15,7 @@ export default class Doppelganger extends Anomaly {
 	public static override name = "Doppelgänger";
 
 	private focus: Vec2 | null = null;
-	private pathfinding = new Pathfinding();
+	private pathfinding: Pathfinding = new Pathfinding();
 
 	public static override description =
 		"A mysterious entity that mimics the appearance of fungies within the mansion.\nCast your spell before it gets too close.";
@@ -40,20 +41,22 @@ export default class Doppelganger extends Anomaly {
 			deltaTime,
 		);
 
-		this.map.doors.forEach(({ position, uuid, isOpen }) => {
+		for (const { position, uuid, isOpen } of this.map.doors) {
 			if (
 				isOpen ||
 				Math.hypot(newPos[0] - position[0], newPos[1] - position[1]) > 1
 			)
-				return;
+				continue;
 
 			this.ws.send(
-				Packet.create(ServerPacketType.DoorToggle, {
-					doorUuid: uuid,
+				Packet.create(ServerPacketType.DoorsToggle, {
+					doorUUIDs: [uuid],
 					isOpen: true,
 				}),
 			);
-		});
+
+			break;
+		}
 
 		this.position = transform3dVec(newPos, this.position[1]);
 		this.rotation[1] = rotationY + Math.PI;

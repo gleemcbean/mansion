@@ -60,12 +60,19 @@ export default class GameMap {
 		return null;
 	}
 
-	public getDoor(doorUuid: UUID): Door | null {
-		return this.doors.find((d) => d.uuid === doorUuid) ?? null;
+	public getDoor(doorUUID: UUID): Door | null {
+		return this.doors.find((d) => d.uuid === doorUUID) ?? null;
 	}
 
-	public getRoom(roomUuid: UUID): PositionedRoom | null {
-		return this.rooms.find((d) => d.uuid === roomUuid) ?? null;
+	public getRoom(roomUUID: UUID): PositionedRoom | null {
+		return this.rooms.find((d) => d.uuid === roomUUID) ?? null;
+	}
+
+	public updateRoom(roomUUID: UUID, data: Partial<PositionedRoom>) {
+		const roomIndex = this.rooms.findIndex((r) => r.uuid === roomUUID);
+		if (roomIndex === -1) return;
+
+		this.rooms[roomIndex]?.updateFromPartial(data as Partial<PositionedRoom>);
 	}
 
 	public get bounds(): { min: Vec2; max: Vec2; width: number; height: number } {
@@ -161,5 +168,12 @@ export default class GameMap {
 		}
 
 		return coords[Math.floor(Math.random() * coords.length)]!;
+	}
+
+	public toJSON() {
+		return {
+			rooms: this.rooms.map((r) => r.toJSON()),
+			doors: this.doors,
+		};
 	}
 }

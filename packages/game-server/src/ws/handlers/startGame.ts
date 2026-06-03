@@ -9,7 +9,7 @@ export default new EventHandler(ClientPacketType.StartGame, (ws) => {
 
 	if (
 		!lobby ||
-		lobby.metadata.ownerUuid !== ws.data.uuid ||
+		lobby.metadata.ownerUUID !== ws.data.uuid ||
 		lobby.metadata.state !== LobbyState.Waiting
 	)
 		return;

@@ -86,6 +86,14 @@ export default class Room {
 		return array;
 	}
 
+	public updateFromPartial(data: Partial<Room>) {
+		if (data.topology) this.topology = data.topology;
+		if (data.doorPoints) this.doorPoints = data.doorPoints;
+		if (data.doorUUIDs) this.doorUUIDs = data.doorUUIDs;
+		if (data.spawns) this.spawns = data.spawns;
+		if (data.lights) this.lights = data.lights;
+	}
+
 	public clone(): Room {
 		const room = new Room(this.id, this.name, this.multiplicity);
 		room.topology = [...this.topology];

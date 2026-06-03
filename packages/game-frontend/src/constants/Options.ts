@@ -11,6 +11,7 @@ export const DEFAULT_OPTIONS = {
 	noise: true,
 	chromaticAberration: true,
 	hud: true,
+	tooltips: true,
 
 	// AUDIO
 	muted: false,
@@ -105,6 +106,11 @@ export const OPTIONS_COMPONENTS = Object.freeze({
 			id: "hud",
 			type: OptionType.Boolean,
 			label: "HUD",
+		},
+		{
+			id: "tooltips",
+			type: OptionType.Boolean,
+			label: "Show Tooltips",
 		},
 	],
 	[OptionCategory.Audio]: [

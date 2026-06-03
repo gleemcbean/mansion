@@ -4,11 +4,13 @@ import type { UUID } from "@mansion/shared/types/util";
 import { useAtom } from "jotai";
 import {
 	anomaliesAtom,
+	lobbyMapAtom,
 	lobbyMetadataAtom,
 	playersAtom,
 } from "../stores/jotaiStore";
 
 export default function useLobby() {
+	const [map, setMap] = useAtom(lobbyMapAtom);
 	const [metadata, setMetadata] = useAtom(lobbyMetadataAtom);
 	const [players, setPlayers] = useAtom(playersAtom);
 	const [anomalies, setAnomalies] = useAtom(anomaliesAtom);
@@ -46,10 +48,12 @@ export default function useLobby() {
 		opened: !!metadata,
 		players,
 		anomalies,
+		map,
 		setMetadata,
 		addPlayer,
 		removePlayer,
 		fillPlayers,
 		fillAnomalies,
+		setMap,
 	};
 }

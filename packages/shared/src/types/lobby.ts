@@ -1,4 +1,3 @@
-import type GameMap from "@/objects/map/GameMap";
 import type { UUID } from "./util";
 
 export enum LobbyState {
@@ -9,7 +8,6 @@ export enum LobbyState {
 
 export type LobbyMetadata = {
 	code: string;
-	ownerUuid: UUID;
+	ownerUUID: UUID;
 	state: LobbyState;
-	map: GameMap | null;
 };

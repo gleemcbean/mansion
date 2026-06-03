@@ -18,9 +18,9 @@ export default class Pathfinding {
 		const [lx, lz] = this.lastGoal;
 		const [hx, hz] = goalPos;
 		const dx = hx - lx;
-		const dz = hz - lz;
+		const dy = hz - lz;
 		const shouldReplan =
-			!this.path || dx * dx + dz * dz > this.path.replanThresholdSq;
+			!this.path || dx * dx + dy * dy > this.path.replanThresholdSq;
 
 		if (shouldReplan) {
 			this.path = findPath(botPos, goalPos, gridData);
@@ -34,8 +34,8 @@ export default class Pathfinding {
 		const [tx, tz] = this.path.waypoints[this.waypointIdx]!;
 		const [bx, bz] = botPos;
 		const dx2 = tx - bx;
-		const dz2 = tz - bz;
-		const distSq = dx2 * dx2 + dz2 * dz2;
+		const dy2 = tz - bz;
+		const distSq = dx2 * dx2 + dy2 * dy2;
 
 		const arrivalRadius = M_GRID_SIZE * 0.5;
 		if (distSq < arrivalRadius * arrivalRadius) {
@@ -45,8 +45,8 @@ export default class Pathfinding {
 
 		const dist = Math.sqrt(distSq);
 		const move = Math.min(speed * dt, dist);
-		const pos = [bx + (dx2 / dist) * move, bz + (dz2 / dist) * move] as Vec2;
-		const rotationY = Math.atan2(dx2, dz2);
+		const pos = [bx + (dx2 / dist) * move, bz + (dy2 / dist) * move] as Vec2;
+		const rotationY = Math.atan2(dx2, dy2);
 		return { pos, rotationY };
 	}
 }

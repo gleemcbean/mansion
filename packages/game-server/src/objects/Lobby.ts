@@ -2,6 +2,7 @@ import {
 	LB_MAX_PLAYERS,
 	LB_MIN_PLAYERS,
 } from "@mansion/shared/constants/lobby";
+import type GameMap from "@mansion/shared/objects/map/GameMap";
 import Packet from "@mansion/shared/objects/Packet";
 import { type LobbyMetadata, LobbyState } from "@mansion/shared/types/lobby";
 import { ServerPacketType } from "@mansion/shared/types/packets";
@@ -16,6 +17,7 @@ import { ANOMALIES } from "@/utils/anomalies";
 import type { WSClient, WSData } from "@/ws/types";
 
 export default class Lobby {
+	public map: GameMap | null = null;
 	public metadata: LobbyMetadata;
 	private players: Map<UUID, WSClient> = new Map();
 	public anomalies: Anomaly[] = [];
@@ -25,8 +27,7 @@ export default class Lobby {
 		this.metadata = {
 			code: Generators.generateLobbyCode(),
 			state: LobbyState.Waiting,
-			ownerUuid: owner.uuid,
-			map: null,
+			ownerUUID: owner.uuid,
 		};
 
 		this.addPlayer(owner);
@@ -98,9 +99,9 @@ export default class Lobby {
 			p.ws.send(Packet.create(ServerPacketType.PlayerLeft, { uuid }));
 		});
 
-		if (uuid === this.metadata.ownerUuid && this.players.size > 0) {
+		if (uuid === this.metadata.ownerUUID && this.players.size > 0) {
 			const newOwner = this.players.values().next().value!;
-			this.metadata.ownerUuid = newOwner.uuid;
+			this.metadata.ownerUUID = newOwner.uuid;
 
 			this.players.forEach((p) => {
 				p.ws.send(
@@ -123,7 +124,7 @@ export default class Lobby {
 
 	public promotePlayer(uuid: UUID) {
 		if (!this.players.has(uuid)) return;
-		this.metadata.ownerUuid = uuid;
+		this.metadata.ownerUUID = uuid;
 
 		this.players.forEach((p) => {
 			p.ws.send(
@@ -142,13 +143,13 @@ export default class Lobby {
 			return;
 
 		this.metadata.state = LobbyState.InGame;
-		this.metadata.map = Generators.generateMap();
+		this.map = Generators.generateMap();
 
 		const playersArray = Array.from(this.players.values());
-		const spawns = playersArray.map(() => this.metadata.map!.randomSpawn());
+		const spawns = playersArray.map(() => this.map!.randomSpawn());
 
 		ANOMALIES.forEach((Anomaly) => {
-			const anomaly = new Anomaly(ws, this.metadata.map!);
+			const anomaly = new Anomaly(ws, this.map!);
 			const anomalySpawn = anomaly.spawn();
 			if (anomalySpawn) this.anomalies.push(anomaly);
 		});
@@ -196,6 +197,7 @@ export default class Lobby {
 			p.ws.send(
 				Packet.create(ServerPacketType.GameStarted, {
 					metadata: this.metadata,
+					map: this.map,
 					gameData: p.playerData.gameData,
 					anomalies: this.anomalies.map((a) => a.toJSON()),
 				}),

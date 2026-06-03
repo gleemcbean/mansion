@@ -77,7 +77,7 @@ export default function Game() {
 			>
 				<Suspense fallback={<THREELoading />}>
 					<PostProcessing />
-					<ambientLight intensity={1.2} color={new THREE.Color(0xecc4f5)} />
+					<ambientLight intensity={0.7} color={new THREE.Color(0xecc4f5)} />
 					{options.showHelper && <axesHelper args={[50]} />}
 					{options.showHelper && <gridHelper args={[100, 100]} />}
 					<PhysicsGate>

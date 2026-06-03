@@ -61,8 +61,8 @@ class MinHeap {
 
 function heuristic(a: Vec2, b: Vec2): number {
 	const dx = Math.abs(a[1] - b[1]);
-	const dz = Math.abs(a[0] - b[0]);
-	return Math.max(dx, dz) + (Math.SQRT2 - 1) * Math.min(dx, dz);
+	const dy = Math.abs(a[0] - b[0]);
+	return Math.max(dx, dy) + (Math.SQRT2 - 1) * Math.min(dx, dy);
 }
 
 export function astar(start: Vec2, goal: Vec2, gridData: Grid): Vec2[] | null {

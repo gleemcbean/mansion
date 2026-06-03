@@ -1,3 +1,5 @@
+import type GameMap from "@/objects/map/GameMap";
+import type Room from "@/objects/map/Room";
 import type { Anomaly } from "./anomalies";
 import type { LobbyMetadata } from "./lobby";
 import type { Client, PlayerData, PlayerGameData } from "./player";
@@ -33,7 +35,7 @@ export enum ServerPacketType {
 	GameStarted = "game-started",
 	PlayerUpdate = "player-update",
 	AnomalyUpdate = "anomaly-update",
-	DoorToggle = "door-toggle",
+	DoorsToggle = "door-toggle",
 	RoomUpdate = "room-update",
 	RTCSignalOffer = "rtc-signal-offer",
 	RTCSignalAnswer = "rtc-signal-answer",
@@ -61,7 +63,7 @@ export type ClientPacketMap = {
 	[ClientPacketType.KickPlayer]: { uuid: UUID };
 	[ClientPacketType.PromotePlayer]: { uuid: UUID };
 	[ClientPacketType.PlayerUpdate]: { gameData: PlayerGameData };
-	[ClientPacketType.DoorToggle]: { doorUuid: UUID, isOpen: boolean };
+	[ClientPacketType.DoorToggle]: { doorUUID: UUID, isOpen: boolean };
 	[ClientPacketType.RTCSignalOffer]: { to: UUID; from: UUID; sdp: string };
 	[ClientPacketType.RTCSignalAnswer]: { to: UUID; from: UUID; sdp: string };
 	[ClientPacketType.RTCSignalCandidate]: { to: UUID; from: UUID; candidate: RTCIceCandidateInit };
@@ -79,11 +81,11 @@ export type ServerPacketMap = {
 	[ServerPacketType.PlayerJoined]: { player: Client };
 	[ServerPacketType.PlayerLeft]: { uuid: UUID };
 	[ServerPacketType.Kicked]: {};
-	[ServerPacketType.GameStarted]: { metadata: LobbyMetadata; gameData: PlayerGameData, anomalies: Anomaly[] };
+	[ServerPacketType.GameStarted]: { metadata: LobbyMetadata; gameData: PlayerGameData; map: GameMap; anomalies: Anomaly[] };
 	[ServerPacketType.PlayerUpdate]: { uuid: UUID; client: Client };
 	[ServerPacketType.AnomalyUpdate]: { anomalyId: string, data: Anomaly };
-	[ServerPacketType.DoorToggle]: { doorUuid: UUID, isOpen: boolean };
-	[ServerPacketType.RoomUpdate]: { roomUuid: UUID };
+	[ServerPacketType.DoorsToggle]: { doorUUIDs: UUID[], isOpen: boolean };
+	[ServerPacketType.RoomUpdate]: { roomUUID: UUID, data: Room };
 	[ServerPacketType.RTCSignalOffer]: { from: UUID; sdp: string };
 	[ServerPacketType.RTCSignalAnswer]: { from: UUID; sdp: string };
 	[ServerPacketType.RTCSignalCandidate]: { from: UUID; candidate: RTCIceCandidateInit };

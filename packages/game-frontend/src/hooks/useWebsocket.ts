@@ -53,6 +53,15 @@ export default function useWebsocket() {
 		return () => _ws.close();
 	}, []);
 
+	const sendSignal = <T extends keyof ServerPacketMap>(
+		type: T,
+		data: ServerPacketMap[T],
+	) => {
+		for (const cb of handlersRef.current.get(type) ?? []) {
+			cb(data);
+		}
+	};
+
 	const send = <T extends keyof ClientPacketMap>(
 		type: T,
 		data?: ClientPacketMap[T],
@@ -94,5 +103,5 @@ export default function useWebsocket() {
 		return () => removeHandler(type, callback);
 	};
 
-	return { send, addHandler, removeHandler, open: !!ws };
+	return { send, sendSignal, addHandler, removeHandler, open: !!ws };
 }

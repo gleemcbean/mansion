@@ -20,4 +20,5 @@ export type Light = {
 	intensity?: number;
 	decay?: number;
 	target?: Vec3 | null;
+	visible?: boolean;
 };

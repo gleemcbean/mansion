@@ -1,4 +1,4 @@
-import type { PositionedRoom } from "@mansion/shared/utils/Map";
+import type PositionedRoom from "@mansion/shared/objects/map/PositionedRoom";
 import { Gltf, useAnimations, useGLTF } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
 import { useEffect, useMemo, useRef } from "react";
@@ -8,33 +8,22 @@ type RoomProps = {
 	data: PositionedRoom;
 };
 
-// function makeAnimation(...steps: [() => void, number][]) {
-// 	const timeouts = [];
-// 	let time = 0;
-
-// 	for (let i = 0; i < steps.length; i++) {
-// 		const [callback, ms] = steps[i]!;
-// 		time += ms;
-// 		timeouts.push(setTimeout(callback, time));
-// 	}
-
-// 	return timeouts;
-// }
-
 export default function Room({ data }: RoomProps) {
 	const groupRef = useRef<THREE.Group>(null);
 
 	const {
 		position: [x, z],
 		rotationY,
-		lights,
 	} = useMemo(() => {
 		return {
 			position: data.position,
 			rotationY: (Math.PI / 2) * -data.direction,
-			lights: data.t_lights,
 		};
 	}, [data.position, data.direction]);
+
+	const lights = useMemo(() => {
+		return data.t_lights;
+	}, [data.lights]);
 
 	const { animations } = useGLTF(`/models/rooms/${data.modelFilename}`);
 	const { actions, names } = useAnimations(animations, groupRef);
@@ -86,6 +75,8 @@ export default function Room({ data }: RoomProps) {
 						color={(light.color ?? 0xe8a7f0) as THREE.ColorRepresentation}
 						decay={light.decay ?? 1.5}
 						intensity={light.intensity ?? 4}
+						distance={4}
+						visible={light.visible ?? true}
 					/>
 				);
 			})}

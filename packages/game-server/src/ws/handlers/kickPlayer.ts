@@ -5,6 +5,6 @@ import { lobbies } from "@/objects/Lobby";
 export default new EventHandler(ClientPacketType.KickPlayer, (ws, { uuid }) => {
 	if (!ws.data.lobby) return;
 	const lobby = lobbies.get(ws.data.lobby);
-	if (!lobby || lobby.metadata.ownerUuid !== ws.data.uuid) return;
+	if (!lobby || lobby.metadata.ownerUUID !== ws.data.uuid) return;
 	lobby.kickPlayer(uuid);
 });

@@ -1,13 +1,13 @@
-import GameMap from "@mansion/shared/objects/map/GameMap";
 import { RigidBody } from "@react-three/rapier";
-import React, { useMemo } from "react";
+import React from "react";
 import useLobby from "@/hooks/useLobby";
 import Door from "../Door";
 import Room from "../Room";
 
 export default function RoomManager() {
-	const { metadata } = useLobby();
-	const map = useMemo(() => GameMap.fromJSON(metadata!.map), [metadata]);
+	const { map } = useLobby();
+
+	if (!map) return null;
 
 	return (
 		<React.Fragment>

@@ -1,14 +1,12 @@
 import type GameMap from "@mansion/shared/objects/map/GameMap";
+import {
+	AnomalyState,
+	type Anomaly as AnomalyType,
+} from "@mansion/shared/types/anomalies";
 import type { Vec3 } from "@mansion/shared/types/util";
 import composeSyllables from "@/utils/composeSyllables";
 import type { WSClient, WSData } from "@/ws/types";
 import type { PlayerGameData } from "../../../shared/src/types/player";
-
-export enum AnomalyState {
-	Roam,
-	Move,
-	Chase,
-}
 
 export default abstract class Anomaly {
 	public position: Vec3 = [0, 0, 0];
@@ -55,7 +53,7 @@ export default abstract class Anomaly {
 		this.timeouts = [];
 	}
 
-	public toJSON() {
+	public toJSON(): AnomalyType {
 		return {
 			id: this.id,
 			name: this.name,
@@ -63,6 +61,7 @@ export default abstract class Anomaly {
 			position: this.position,
 			rotation: this.rotation,
 			syllables: this.syllables,
+			state: this.state,
 			entity_data: this.entityData,
 		};
 	}
