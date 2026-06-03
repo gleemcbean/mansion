@@ -74,7 +74,7 @@ export default function Phantom({ data }: PhantomProps) {
 			...lightData,
 		}));
 
-		setMap(map!);
+		setMap(map!.clone());
 	};
 
 	useEffect(() => {
@@ -96,8 +96,13 @@ export default function Phantom({ data }: PhantomProps) {
 							loop: true,
 							frames: [
 								{
-									action: () => updateLights({ visible: false }),
-									duration: [60, 180],
+									action: () =>
+										updateLights({
+											visible: true,
+											color: 0xe8a7f0,
+											intensity: 1,
+										}),
+									duration: [60, 480],
 								},
 								{
 									action: () =>

@@ -39,7 +39,8 @@ export default class Phantom extends Anomaly {
 				.map((p) => p.playerData!.gameData!)
 				.filter(
 					(p) =>
-						this.room!.t_pointIn(transform2dVec(p.position)) && !p.crouched,
+						this.room!.t_pointIn(transform2dVec(p.position)) &&
+						(this.state === AnomalyState.Roam ? !p.crouched : true),
 				).length > 0
 		) {
 			presence = true;
@@ -67,6 +68,21 @@ export default class Phantom extends Anomaly {
 				this.updateState(AnomalyState.Roam);
 				this.kill();
 			}
+		}
+
+		if (this.presence && this.state === AnomalyState.Chase) {
+			players.forEach((p) => {
+				const data = p?.playerData?.gameData;
+				if (!data) return;
+				data.health -= 1;
+
+				p.ws.send(
+					Packet.create(ServerPacketType.PlayerUpdate, {
+						uuid: p.uuid,
+						client: { playerData: { gameData: { health: data.health } } },
+					}),
+				);
+			});
 		}
 
 		this.presence = presence;

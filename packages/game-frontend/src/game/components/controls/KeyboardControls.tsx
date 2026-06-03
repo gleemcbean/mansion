@@ -14,7 +14,10 @@ import {
 	PL_SPRINT_SPEED_MULTIPLIER,
 	PL_THICKNESS,
 } from "@mansion/shared/constants/player";
-import { ClientPacketType } from "@mansion/shared/types/packets";
+import {
+	ClientPacketType,
+	ServerPacketType,
+} from "@mansion/shared/types/packets";
 import type { PlayerGameData } from "@mansion/shared/types/player";
 import type { Vec2 } from "@mansion/shared/types/util";
 import {
@@ -96,6 +99,8 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 	const lastSent = useRef(0);
 	const lastEnergyDrain = useRef(0);
 	const energy = useRef(100);
+	const health = useRef(100);
+	const targetHealth = useRef(100);
 	const wasCrouching = useRef(false);
 	const fovRef = useRef(PL_FOV);
 	const targetFovRef = useRef(PL_FOV);
@@ -109,7 +114,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 	const { 1: get } = useKeyboardControls();
 	const { client, options, room, bookOpen, setRoom, setGameData } = useClient();
 	const { map } = useLobby();
-	const { send } = useWebsocket();
+	const { send, addHandler } = useWebsocket();
 	const { scene } = useThree();
 
 	useEffect(() => {
@@ -138,6 +143,66 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 			},
 			false,
 		);
+
+		const unsubscribe = addHandler(
+			ServerPacketType.PlayerUpdate,
+			({ uuid, client: _client }) => {
+				if (
+					uuid !== client.uuid ||
+					!_client.playerData?.gameData ||
+					!client.playerData?.gameData
+				)
+					return;
+
+				if (_client.playerData.gameData?.position) {
+					const [x, y, z] = _client.playerData.gameData.position;
+					body.current?.setTranslation({ x, y, z }, false);
+					client.playerData.gameData.position = [x, y, z];
+				}
+
+				if (_client.playerData.gameData?.quaternion) {
+					const [x, y, z, w] = _client.playerData.gameData.quaternion;
+					body.current?.setRotation({ x, y, z, w }, false);
+					client.playerData.gameData.quaternion = [x, y, z, w];
+				}
+
+				if (_client.playerData.gameData?.lighting !== undefined) {
+					lightingValue.current = _client.playerData.gameData.lighting;
+					client.playerData.gameData.lighting = lightingValue.current;
+
+					if (spotLightRef.current) {
+						spotLightRef.current.visible = lightingValue.current;
+					}
+				}
+
+				if (_client.playerData.gameData?.energy !== undefined) {
+					energy.current = _client.playerData.gameData.energy;
+					client.playerData.gameData.energy = energy.current;
+				}
+
+				if (_client.playerData.gameData?.health !== undefined) {
+					targetHealth.current = _client.playerData.gameData.health;
+					client.playerData.gameData.health = targetHealth.current;
+				}
+
+				if (_client.playerData.gameData?.crouched !== undefined) {
+					if (_client.playerData.gameData.crouched) {
+						targetHeightRef.current = PL_CROUCH_HEIGHT;
+						targetThicknessRef.current = PL_CROUCH_THICKNESS;
+					} else {
+						targetHeightRef.current = PL_HEIGHT;
+						targetThicknessRef.current = PL_THICKNESS;
+					}
+
+					client.playerData.gameData.crouched =
+						_client.playerData.gameData.crouched;
+				}
+
+				setGameData(client.playerData.gameData);
+			},
+		);
+
+		return unsubscribe;
 	}, []);
 
 	const syncRaycasterRanges = useCallback(() => {
@@ -193,7 +258,11 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 			if (sprinting) energy.current -= delta * 10;
 			if (lightingValue.current) energy.current -= delta * 6;
 		}
+
 		energy.current = Math.max(0, energy.current);
+
+		health.current +=
+			(targetHealth.current - health.current) * Math.min(delta * 5, 0);
 
 		if (energy.current !== oldEnergy) {
 			lastEnergyDrain.current = Date.now();
@@ -362,7 +431,7 @@ function KeyboardControlsLogic({ spawn }: KeyboardControlsProps) {
 				quaternion: q,
 				crouched,
 				running: sprint,
-				health: 100,
+				health: targetHealth.current,
 				energy: energy.current,
 				lighting: lightingValue.current,
 				anomalySteps: oldGameData?.anomalySteps ?? {},

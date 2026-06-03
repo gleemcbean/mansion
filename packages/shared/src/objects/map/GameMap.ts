@@ -176,4 +176,8 @@ export default class GameMap {
 			doors: this.doors,
 		};
 	}
+
+	public clone(): GameMap {
+		return GameMap.fromJSON(this.toJSON());
+	}
 }

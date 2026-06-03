@@ -20,8 +20,9 @@ export default function PlayerManager() {
 			addHandler(ServerPacketType.PlayerLeft, ({ uuid }) => {
 				removePlayer(uuid);
 			}),
-			addHandler(ServerPacketType.PlayerUpdate, ({ uuid, client }) => {
-				players.set(uuid, client);
+			addHandler(ServerPacketType.PlayerUpdate, ({ uuid, client: _client }) => {
+				if (!players.has(uuid) || uuid === client.uuid) return;
+				players.set(uuid, _client);
 				setPlayers(new Map(players));
 			}),
 		];
